@@ -169,11 +169,29 @@ export default function StudentVoting() {
     }
   };
 
+  const generateNewVoterId = () => {
+    const newVoterId = `voter_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    localStorage.setItem('voterId', newVoterId);
+    setVoterId(newVoterId);
+  };
+
+  const handleNextVoter = () => {
+    generateNewVoterId();
+    setVotes({});
+    setSubmittedRoles(new Set());
+    setError('');
+  };
+
   const selectedPoll = polls.find((p) => p.id === selectedPollId);
+  const allRolesVoted =
+    selectedPoll &&
+    selectedPoll.roles.length > 0 &&
+    submittedRoles.size === selectedPoll.roles.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 p-4">
       <div className="container mx-auto max-w-4xl">
+        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" />
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-green-600 p-4 rounded-full">
@@ -301,6 +319,26 @@ export default function StudentVoting() {
                     </div>
                   );
                 })}
+
+                {allRolesVoted && (
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-2xl shadow-xl p-12 text-center">
+                    <div className="flex justify-center mb-6">
+                      <div className="bg-green-600 p-4 rounded-full">
+                        <CheckCircle className="w-16 h-16 text-white" />
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Voting Complete!</h3>
+                    <p className="text-gray-600 mb-8 text-lg">
+                      Thank you for voting. Your votes have been recorded successfully.
+                    </p>
+                    <button
+                      onClick={handleNextVoter}
+                      className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
+                    >
+                      Next Voter
+                    </button>
+                  </div>
+                )}
 
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">

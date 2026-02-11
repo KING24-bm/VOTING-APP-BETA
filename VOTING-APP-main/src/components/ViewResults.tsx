@@ -120,6 +120,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="container mx-auto max-w-6xl">
+        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" />
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6 transition"

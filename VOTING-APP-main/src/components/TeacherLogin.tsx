@@ -29,7 +29,9 @@ export default function TeacherLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-12" />
+      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="flex justify-center mb-6">
           <div className="bg-blue-600 p-4 rounded-full">
@@ -74,6 +76,7 @@ export default function TeacherLogin() {
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+      </div>
       </div>
     </div>
   );

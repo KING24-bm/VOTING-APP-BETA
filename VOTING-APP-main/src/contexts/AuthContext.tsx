@@ -24,31 +24,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (staffCode: string): Promise<boolean> => {
     try {
+      const code = staffCode.trim();
       const { data: teacher, error } = await supabase
         .from('teachers')
         .select('id')
-        .eq('staff_code', staffCode)
+        .eq('staff_code', code)
         .maybeSingle();
 
       if (error) throw error;
 
+      // Only allow login if the staff code already exists.
+      // Do NOT auto-create new teacher rows here.
       if (teacher) {
         setTeacherId(teacher.id);
         localStorage.setItem('teacherId', teacher.id);
         return true;
-      } else {
-        const { data: newTeacher, error: insertError } = await supabase
-          .from('teachers')
-          .insert({ staff_code: staffCode })
-          .select('id')
-          .single();
-
-        if (insertError) throw insertError;
-
-        setTeacherId(newTeacher.id);
-        localStorage.setItem('teacherId', newTeacher.id);
-        return true;
       }
+
+      return false;
     } catch (error) {
       console.error('Login error:', error);
       return false;
