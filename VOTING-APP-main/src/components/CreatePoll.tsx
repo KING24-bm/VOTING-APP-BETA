@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
@@ -6,7 +6,8 @@ import { ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
 interface Candidate {
   id: string;
   name: string;
-  imageUrl: string;
+  imageUrl: string;   // main picture
+  logoUrl: string;    // additional logo
 }
 
 interface Role {
@@ -54,7 +55,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
               ...r,
               candidates: [
                 ...r.candidates,
-                { id: Date.now().toString(), name: '', imageUrl: '' },
+                { id: Date.now().toString(), name: '', imageUrl: '', logoUrl: '' },
               ],
             }
           : r
@@ -78,7 +79,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
   const updateCandidate = (
     roleId: string,
     candidateId: string,
-    field: 'name' | 'imageUrl',
+    field: 'name' | 'imageUrl' | 'logoUrl',
     value: string
   ) => {
     setRoles(
@@ -98,11 +99,14 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
   const handleImageUpload = async (
     roleId: string,
     candidateId: string,
-    file: File
+    file: File,
+    field: 'imageUrl' | 'logoUrl'
   ) => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const fileName = `${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(7)}.${fileExt}`;
       const filePath = `candidates/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -115,7 +119,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         .from('images')
         .getPublicUrl(filePath);
 
-      updateCandidate(roleId, candidateId, 'imageUrl', data.publicUrl);
+      updateCandidate(roleId, candidateId, field, data.publicUrl);
     } catch (err) {
       console.error('Upload error:', err);
       alert('Failed to upload image. Please try again.');
@@ -193,6 +197,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
               role_id: roleData.id,
               name: candidate.name,
               image_url: candidate.imageUrl,
+              logo_url: candidate.logoUrl, // new column
             });
 
           if (candidateError) throw candidateError;
@@ -203,8 +208,10 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
       onBack();
     } catch (err) {
       console.error('Error creating poll:', err);
-      // Surface Supabase error message when available
-      const message = (err as any)?.message || (err as any)?.error || JSON.stringify(err);
+      const message =
+        (err as any)?.message ||
+        (err as any)?.error ||
+        JSON.stringify(err);
       setError(message || 'Failed to create poll. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -214,7 +221,11 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="container mx-auto max-w-4xl">
-        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" />
+        <img
+          src="/images/euroschool-logo.png"
+          alt="EuroSchool North Campus"
+          className="h-16 w-16 object-contain mb-8"
+        />
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6 transition"
@@ -224,181 +235,218 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         </button>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Create New Poll</h1>
-
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Poll Title
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Student Council Elections 2024"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={3}
-                  placeholder="Add a description for this poll..."
-                />
-              </div>
+            <div>
+              <label className="block text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Poll title"
+              />
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800">Roles & Candidates</h2>
-                <button
-                  type="button"
-                  onClick={addRole}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  <Plus className="w-5 h-5" />
-                  Add Role
-                </button>
-              </div>
+            <div>
+              <label className="block text-gray-700 mb-1">
+                Description (optional)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Write a short description"
+                rows={3}
+              />
+            </div>
 
-              {roles.map((role, roleIndex) => (
-                <div
-                  key={role.id}
-                  className="border-2 border-gray-200 rounded-xl p-6 space-y-4"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Role Name
-                      </label>
+            {roles.map((role) => (
+              <div
+                key={role.id}
+                className="border-2 border-gray-200 rounded-xl p-6 space-y-4"
+              >
+                <div className="flex items-center gap-4">
+                  <input
+                    type="text"
+                    value={role.name}
+                    onChange={(e) =>
+                      updateRoleName(role.id, e.target.value)
+                    }
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Role name"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeRole(role.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {role.candidates.map((candidate) => (
+                  <div
+                    key={candidate.id}
+                    className="flex flex-col gap-4 bg-gray-50 p-4 rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
                       <input
                         type="text"
-                        value={role.name}
-                        onChange={(e) => updateRoleName(role.id, e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., Head Boy, Head Girl, Sports Captain"
+                        value={candidate.name}
+                        onChange={(e) =>
+                          updateCandidate(
+                            role.id,
+                            candidate.id,
+                            'name',
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Candidate name"
                       />
-                    </div>
-                    {roles.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => removeRole(role.id)}
-                        className="mt-6 p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                        onClick={() =>
+                          removeCandidate(role.id, candidate.id)
+                        }
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
-                    )}
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-700">Candidates</h3>
-                      <button
-                        type="button"
-                        onClick={() => addCandidate(role.id)}
-                        className="flex items-center gap-2 px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Add Candidate
-                      </button>
                     </div>
 
-                    {role.candidates.map((candidate) => (
-                      <div
-                        key={candidate.id}
-                        className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg"
-                      >
-                        <div className="flex-1 space-y-2">
-                          <input
-                            type="text"
-                            value={candidate.name}
-                            onChange={(e) =>
-                              updateCandidate(role.id, candidate.id, 'name', e.target.value)
+                    {/* candidate picture */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="url"
+                        value={candidate.imageUrl}
+                        onChange={(e) =>
+                          updateCandidate(
+                            role.id,
+                            candidate.id,
+                            'imageUrl',
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        placeholder="Image URL (candidate picture)"
+                      />
+                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg cursor-pointer transition text-sm">
+                        <Upload className="w-4 h-4" />
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(
+                                role.id,
+                                candidate.id,
+                                file,
+                                'imageUrl'
+                              );
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Candidate name"
-                          />
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="url"
-                              value={candidate.imageUrl}
-                              onChange={(e) =>
-                                updateCandidate(role.id, candidate.id, 'imageUrl', e.target.value)
-                              }
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                              placeholder="Image URL (paste link or upload)"
-                            />
-                            <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg cursor-pointer transition text-sm">
-                              <Upload className="w-4 h-4" />
-                              Upload
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    handleImageUpload(role.id, candidate.id, file);
-                                  }
-                                }}
-                              />
-                            </label>
-                          </div>
-                        </div>
-                        {candidate.imageUrl && (
-                          <img
-                            src={candidate.imageUrl}
-                            alt={candidate.name}
-                            className="w-16 h-16 object-cover rounded-lg"
-                          />
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => removeCandidate(role.id, candidate.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    ))}
+                          }}
+                        />
+                      </label>
+                    </div>
 
-                    {role.candidates.length === 0 && (
-                      <p className="text-gray-500 text-sm text-center py-4">
-                        No candidates added yet. Click "Add Candidate" to start.
-                      </p>
-                    )}
+                    {/* candidate logo */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="url"
+                        value={candidate.logoUrl}
+                        onChange={(e) =>
+                          updateCandidate(
+                            role.id,
+                            candidate.id,
+                            'logoUrl',
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        placeholder="Logo URL (candidate logo)"
+                      />
+                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg cursor-pointer transition text-sm">
+                        <Upload className="w-4 h-4" />
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(
+                                role.id,
+                                candidate.id,
+                                file,
+                                'logoUrl'
+                              );
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* previews */}
+                    <div className="flex gap-2">
+                      {candidate.imageUrl && (
+                        <img
+                          src={candidate.imageUrl}
+                          alt={`${candidate.name} picture`}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      )}
+                      {candidate.logoUrl && (
+                        <img
+                          src={candidate.logoUrl}
+                          alt={`${candidate.name} logo`}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                {error}
+                <button
+                  type="button"
+                  onClick={() => addCandidate(role.id)}
+                  className="mt-2 flex items-center gap-2 text-blue-600 hover:text-blue-800 transition"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add candidate
+                </button>
               </div>
-            )}
+            ))}
 
-            <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={addRole}
+              className="flex items-center gap-2 text-green-600 hover:text-green-800 transition"
+            >
+              <Plus className="w-4 h-4" />
+              Add role
+            </button>
+
+            {error && <p className="text-red-600">{error}</p>}
+
+            <div className="flex justify-end gap-4">
               <button
                 type="button"
                 onClick={onBack}
-                className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
+                className="px-4 py-2 border rounded-lg"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
               >
-                {isSubmitting ? 'Publishing...' : 'Publish Poll'}
+                {isSubmitting ? 'Publishing...' : 'Publish poll'}
               </button>
             </div>
           </form>

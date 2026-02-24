@@ -6,6 +6,7 @@ interface Candidate {
   id: string;
   name: string;
   image_url: string;
+  logo_url: string;          // added
 }
 
 interface Role {
@@ -73,7 +74,7 @@ export default function StudentVoting() {
               (roles || []).map(async (role) => {
                 const { data: candidates, error: candidatesError } = await supabase
                   .from('candidates')
-                  .select('id, name, image_url')
+                  .select('id, name, image_url, logo_url') // include logo_url
                   .eq('role_id', role.id);
 
                 if (candidatesError) throw candidatesError;
@@ -280,16 +281,25 @@ export default function StudentVoting() {
                               } ${hasVoted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                               <div className="flex items-center gap-4">
-                                {candidate.image_url ? (
+                                <div className="flex-shrink-0">
+                                  {candidate.image_url ? (
+                                    <img
+                                      src={candidate.image_url}
+                                      alt={candidate.name}
+                                      className="w-20 h-20 object-cover rounded-lg"
+                                    />
+                                  ) : (
+                                    <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                      <User className="w-10 h-10 text-gray-400" />
+                                    </div>
+                                  )}
+                                </div>
+                                {candidate.logo_url && (
                                   <img
-                                    src={candidate.image_url}
-                                    alt={candidate.name}
-                                    className="w-20 h-20 object-cover rounded-lg"
+                                    src={candidate.logo_url}
+                                    alt={`${candidate.name} logo`}
+                                    className="w-10 h-10 object-cover rounded-full"
                                   />
-                                ) : (
-                                  <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <User className="w-10 h-10 text-gray-400" />
-                                  </div>
                                 )}
                                 <div className="flex-1 text-left">
                                   <h4 className="text-lg font-semibold text-gray-800">
@@ -327,7 +337,7 @@ export default function StudentVoting() {
                         <CheckCircle className="w-16 h-16 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Voting Complete!</h3>
+                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Voting Complete!</h3>  
                     <p className="text-gray-600 mb-8 text-lg">
                       Thank you for voting. Your votes have been recorded successfully.
                     </p>
