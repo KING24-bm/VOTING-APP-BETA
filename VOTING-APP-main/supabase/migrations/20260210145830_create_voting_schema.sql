@@ -4,7 +4,7 @@
   1. New Tables
     - `teachers`
       - `id` (uuid, primary key)
-      - `staff_code` (text, unique) - hashed staff code for teacher login
+      - `staff_code` (text, unique) - legacy field that might be used for backwards compatibility
       - `created_at` (timestamp)
     
     - `polls`
@@ -47,7 +47,10 @@
 -- Create teachers table
 CREATE TABLE IF NOT EXISTS teachers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  staff_code text UNIQUE NOT NULL,
+  username text UNIQUE NOT NULL,
+  password text NOT NULL,
+  -- legacy staff_code retained for compatibility but no longer required
+  staff_code text UNIQUE,
   created_at timestamptz DEFAULT now()
 );
 
@@ -96,6 +99,10 @@ ALTER TABLE candidates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE votes ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for teachers
+-- drop any existing policies so script can be re-run without errors
+DROP POLICY IF EXISTS "Anyone can read teachers" ON teachers;
+DROP POLICY IF EXISTS "Anyone can insert teachers" ON teachers;
+
 CREATE POLICY "Anyone can read teachers"
   ON teachers FOR SELECT
   USING (true);
@@ -105,6 +112,11 @@ CREATE POLICY "Anyone can insert teachers"
   WITH CHECK (true);
 
 -- RLS Policies for polls
+DROP POLICY IF EXISTS "Anyone can view polls" ON polls;
+DROP POLICY IF EXISTS "Anyone can create polls" ON polls;
+DROP POLICY IF EXISTS "Anyone can update polls" ON polls;
+DROP POLICY IF EXISTS "Anyone can delete polls" ON polls;
+
 CREATE POLICY "Anyone can view polls"
   ON polls FOR SELECT
   USING (true);
@@ -122,6 +134,11 @@ CREATE POLICY "Anyone can delete polls"
   USING (true);
 
 -- RLS Policies for roles
+DROP POLICY IF EXISTS "Anyone can view roles" ON roles;
+DROP POLICY IF EXISTS "Anyone can create roles" ON roles;
+DROP POLICY IF EXISTS "Anyone can update roles" ON roles;
+DROP POLICY IF EXISTS "Anyone can delete roles" ON roles;
+
 CREATE POLICY "Anyone can view roles"
   ON roles FOR SELECT
   USING (true);
@@ -139,6 +156,11 @@ CREATE POLICY "Anyone can delete roles"
   USING (true);
 
 -- RLS Policies for candidates
+DROP POLICY IF EXISTS "Anyone can view candidates" ON candidates;
+DROP POLICY IF EXISTS "Anyone can create candidates" ON candidates;
+DROP POLICY IF EXISTS "Anyone can update candidates" ON candidates;
+DROP POLICY IF EXISTS "Anyone can delete candidates" ON candidates;
+
 CREATE POLICY "Anyone can view candidates"
   ON candidates FOR SELECT
   USING (true);
@@ -156,6 +178,9 @@ CREATE POLICY "Anyone can delete candidates"
   USING (true);
 
 -- RLS Policies for votes
+DROP POLICY IF EXISTS "Anyone can view votes" ON votes;
+DROP POLICY IF EXISTS "Anyone can cast votes" ON votes;
+
 CREATE POLICY "Anyone can view votes"
   ON votes FOR SELECT
   USING (true);

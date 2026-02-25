@@ -3,7 +3,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { LogIn } from 'lucide-react';
 
 export default function TeacherLogin() {
-  const [staffCode, setStaffCode] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -13,16 +14,16 @@ export default function TeacherLogin() {
     setError('');
     setIsLoading(true);
 
-    if (!staffCode.trim()) {
-      setError('Please enter a staff code');
+    if (!username.trim() || !password) {
+      setError('Please enter both username and password');
       setIsLoading(false);
       return;
     }
 
-    const success = await login(staffCode);
+    const success = await login(username, password);
 
     if (!success) {
-      setError('Login failed. Please try again.');
+      setError('Login failed. Please check your credentials and try again.');
     }
 
     setIsLoading(false);
@@ -43,21 +44,36 @@ export default function TeacherLogin() {
           Teacher Login
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Enter your staff code to access the dashboard
+          Please log in with your username and password to access the dashboard
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="staffCode" className="block text-sm font-medium text-gray-700 mb-2">
-              Staff Code
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              Username
             </label>
             <input
-              id="staffCode"
+              id="username"
               type="text"
-              value={staffCode}
-              onChange={(e) => setStaffCode(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              placeholder="Enter your staff code"
+              placeholder="Enter your username"
+              disabled={isLoading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              placeholder="Enter your password"
               disabled={isLoading}
             />
           </div>

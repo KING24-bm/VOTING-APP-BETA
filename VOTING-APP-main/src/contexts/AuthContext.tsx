@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
   teacherId: string | null;
-  login: (staffCode: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -22,19 +22,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (staffCode: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const code = staffCode.trim();
+      const user = username.trim();
+      // In a production system the password should be hashed and verified
+      // with a secure hashing algorithm. Here we're just doing a simple
+      // equality check for demonstration purposes.
       const { data: teacher, error } = await supabase
         .from('teachers')
         .select('id')
-        .eq('staff_code', code)
+        .eq('username', user)
+        .eq('password', password)
         .maybeSingle();
 
       if (error) throw error;
 
-      // Only allow login if the staff code already exists.
-      // Do NOT auto-create new teacher rows here.
       if (teacher) {
         setTeacherId(teacher.id);
         localStorage.setItem('teacherId', teacher.id);
