@@ -31,7 +31,7 @@ export default function TeacherLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-12" />
+      <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-12" onClick={() => window.location.href = "/"}/>
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="flex justify-center mb-6">

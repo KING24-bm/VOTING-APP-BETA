@@ -134,7 +134,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="container mx-auto max-w-6xl">
-        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" />
+        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" onClick={() => window.location.href = "/"}/>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6 transition"
@@ -207,45 +207,16 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                         const chartData = role.candidates.map((candidate) => ({
                           name: candidate.name,
                           votes: candidate.vote_count,
-                          image_url: candidate.image_url,
                         }));
-
-                        const CustomTick = (props: any) => {
-                          const { x, y, payload } = props;
-                          const candidate = chartData.find((d) => d.name === payload.value);
-
-                          return (
-                            <g transform={`translate(${x},${y})`}>
-                              <foreignObject x={-50} y={0} width={100} height={120}>
-                                <div className="flex flex-col items-center justify-center h-full">
-                                  {candidate?.image_url && (
-                                    <img
-                                      src={candidate.image_url}
-                                      alt={candidate.name}
-                                      className="w-12 h-12 object-cover rounded-lg mb-1"
-                                    />
-                                  )}
-                                  <text
-                                    className="text-xs font-semibold text-gray-800 text-center"
-                                    textAnchor="middle"
-                                    dy={4}
-                                  >
-                                    {payload.value.split(' ').slice(0, 2).join(' ')}
-                                  </text>
-                                </div>
-                              </foreignObject>
-                            </g>
-                          );
-                        };
 
                         return (
                           <div key={role.id} className="border-2 border-gray-200 rounded-xl p-6">
                             <h2 className="text-2xl font-bold text-gray-800 mb-6">{role.name}</h2>
                             <div className="h-96 w-full">
                               <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData} margin={{ bottom: 120, left: 0, right: 0, top: 0 }}>
+                                <BarChart data={chartData}>
                                   <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis dataKey="name" tick={<CustomTick />} height={120} />
+                                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                                   <YAxis />
                                   <Tooltip />
                                   <Bar dataKey="votes" fill="#2563eb" radius={[8, 8, 0, 0]} />

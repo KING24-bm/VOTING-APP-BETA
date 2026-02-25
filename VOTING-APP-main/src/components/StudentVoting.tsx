@@ -192,7 +192,7 @@ export default function StudentVoting() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 p-4">
       <div className="container mx-auto max-w-4xl">
-        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" />
+        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain cursor-pointer mb-8" onClick={() => window.location.href = "/"} />
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-green-600 p-4 rounded-full">
