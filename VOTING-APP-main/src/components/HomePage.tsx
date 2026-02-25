@@ -9,7 +9,7 @@ export default function HomePage({ onSelectTeacher, onSelectStudent }: HomePageP
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 p-4">
       <div className="mb-12">
-        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain" />
+        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain cursor-pointer" onClick={() => window.location.href = "/"} />
       </div>
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
       <div className="max-w-4xl w-full">
