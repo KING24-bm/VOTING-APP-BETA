@@ -109,20 +109,38 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         .substring(7)}.${fileExt}`;
       const filePath = `candidates/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      // include contentType and avoid overwriting by default
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('images')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type || 'application/octet-stream',
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Supabase upload error details:', uploadError);
+        throw uploadError;
+      }
 
-      const { data } = supabase.storage
+      // getPublicUrl is synchronous in supabase-js v2
+      const { data: publicData } = supabase.storage
         .from('images')
         .getPublicUrl(filePath);
 
-      updateCandidate(roleId, candidateId, field, data.publicUrl);
+      const publicUrl = (publicData && (publicData as any).publicUrl) || '';
+
+      if (!publicUrl) {
+        console.error('Failed to get public URL after upload', { uploadData, publicData });
+        throw new Error('Failed to obtain public URL for uploaded file');
+      }
+
+      updateCandidate(roleId, candidateId, field, publicUrl);
     } catch (err) {
       console.error('Upload error:', err);
-      alert('Failed to upload image. Please try again.');
+      // Prefer readable message when available
+      const message = (err as any)?.message || (err as any)?.error || JSON.stringify(err);
+      alert(`Failed to upload image. ${message}`);
     }
   };
 
