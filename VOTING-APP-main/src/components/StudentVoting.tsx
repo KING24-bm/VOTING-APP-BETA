@@ -281,30 +281,32 @@ export default function StudentVoting() {
                               } ${hasVoted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                               <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0">
-                                  {candidate.image_url ? (
+                                <div className="flex flex-col items-center">
+                                  {candidate.logo_url && (
                                     <img
-                                      src={candidate.image_url}
-                                      alt={candidate.name}
-                                      className="w-20 h-20 object-cover rounded-lg"
+                                      src={candidate.logo_url}
+                                      alt={`${candidate.name} logo`}
+                                      className="w-10 h-10 object-cover rounded-full"
                                     />
-                                  ) : (
-                                    <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                                      <User className="w-10 h-10 text-gray-400" />
-                                    </div>
                                   )}
-                                </div>
-                                {candidate.logo_url && (
-                                  <img
-                                    src={candidate.logo_url}
-                                    alt={`${candidate.name} logo`}
-                                    className="w-10 h-10 object-cover rounded-full"
-                                  />
-                                )}
-                                <div className="flex-1 text-left">
-                                  <h4 className="text-lg font-semibold text-gray-800">
-                                    {candidate.name}
-                                  </h4>
+                                  <div className="flex items-center gap-4 mt-2">
+                                    <h4 className="text-lg font-semibold text-gray-800">
+                                      {candidate.name}
+                                    </h4>
+                                    <div className="flex-shrink-0">
+                                      {candidate.image_url ? (
+                                        <img
+                                          src={candidate.image_url}
+                                          alt={candidate.name}
+                                          className="w-20 h-20 object-cover rounded-lg"
+                                        />
+                                      ) : (
+                                        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                          <User className="w-10 h-10 text-gray-400" />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
                                   {isSelected && !hasVoted && (
                                     <p className="text-sm text-green-600 font-medium mt-1">
                                       Selected
