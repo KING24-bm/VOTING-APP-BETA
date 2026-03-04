@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Vote, CheckCircle, User } from 'lucide-react';
+import { Vote, CheckCircle, User, LogOut } from 'lucide-react';
 
 interface Candidate {
   id: string;
   name: string;
   image_url: string;
-  logo_url: string;          // added
+  logo_url: string;
 }
 
 interface Role {
@@ -22,7 +22,32 @@ interface Poll {
   roles: Role[];
 }
 
+interface VerifiedStudent {
+  id: string;
+  student_id: string;
+  name: string;
+  school_id: string;
+}
+
 export default function StudentVoting() {
+  // Verification states
+  const [isVerified, setIsVerified] = useState(false);
+  const [studentId, setStudentId] = useState('');
+  const [schoolId, setSchoolId] = useState('');
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [verificationError, setVerificationError] = useState('');
+  const [verifiedStudent, setVerifiedStudent] = useState<VerifiedStudent | null>(null);
+
+  // Dummy student data for testing
+  const DUMMY_STUDENTS: VerifiedStudent[] = [
+    { id: '1', student_id: 'STU001', name: 'John Doe', school_id: 'SCHOOL001' },
+    { id: '2', student_id: 'STU002', name: 'Jane Smith', school_id: 'SCHOOL001' },
+    { id: '3', student_id: 'STU003', name: 'Mike Johnson', school_id: 'SCHOOL002' },
+    { id: '4', student_id: 'STU004', name: 'Sarah Williams', school_id: 'SCHOOL002' },
+    { id: '5', student_id: 'STU005', name: 'Alex Brown', school_id: 'SCHOOL001' },
+  ];
+
+  // Voting states
   const [polls, setPolls] = useState<Poll[]>([]);
   const [selectedPollId, setSelectedPollId] = useState<string>('');
   const [voterId, setVoterId] = useState<string>('');
@@ -32,23 +57,71 @@ export default function StudentVoting() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const storedVoterId = localStorage.getItem('voterId');
-    if (!storedVoterId) {
-      const newVoterId = `voter_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      localStorage.setItem('voterId', newVoterId);
-      setVoterId(newVoterId);
-    } else {
-      setVoterId(storedVoterId);
+    if (isVerified) {
+      initializeVoting();
     }
-
-    fetchPolls();
-  }, []);
+  }, [isVerified]);
 
   useEffect(() => {
     if (selectedPollId && voterId) {
       checkExistingVotes(selectedPollId);
     }
   }, [selectedPollId, voterId]);
+
+  const handleVerifyStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVerificationLoading(true);
+    setVerificationError('');
+
+    try {
+      // First check dummy data (for testing)
+      const dummyStudent = DUMMY_STUDENTS.find(
+        (s) => s.student_id === studentId.toUpperCase() && s.school_id === schoolId.toUpperCase()
+      );
+
+      if (dummyStudent) {
+        setVerifiedStudent(dummyStudent);
+        setIsVerified(true);
+        setVerificationLoading(false);
+        return;
+      }
+
+      // Query Supabase for student verification
+      const { data, error: supabaseError } = await supabase
+        .from('students')
+        .select('id, student_id, name, school_id')
+        .eq('student_id', studentId.toUpperCase())
+        .eq('school_id', schoolId.toUpperCase())
+        .single();
+
+      if (supabaseError || !data) {
+        setVerificationError('Invalid Student ID or School ID. Please try again.');
+        setVerificationLoading(false);
+        return;
+      }
+
+      setVerifiedStudent(data as VerifiedStudent);
+      setIsVerified(true);
+    } catch (err) {
+      setVerificationError('An error occurred during verification. Please try again.');
+      console.error(err);
+    }
+
+    setVerificationLoading(false);
+  };
+
+  const initializeVoting = () => {
+    const storedVoterId = localStorage.getItem(`voterId_${verifiedStudent?.id}`);
+    if (!storedVoterId) {
+      const newVoterId = `voter_${verifiedStudent?.id}_${Date.now()}`;
+      localStorage.setItem(`voterId_${verifiedStudent?.id}`, newVoterId);
+      setVoterId(newVoterId);
+    } else {
+      setVoterId(storedVoterId);
+    }
+
+    fetchPolls();
+  };
 
   const fetchPolls = async () => {
     try {
@@ -74,7 +147,7 @@ export default function StudentVoting() {
               (roles || []).map(async (role) => {
                 const { data: candidates, error: candidatesError } = await supabase
                   .from('candidates')
-                  .select('id, name, image_url, logo_url') // include logo_url
+                  .select('id, name, image_url, logo_url')
                   .eq('role_id', role.id);
 
                 if (candidatesError) throw candidatesError;
@@ -151,6 +224,8 @@ export default function StudentVoting() {
         role_id: roleId,
         candidate_id: candidateId,
         voter_id: voterId,
+        student_id: verifiedStudent?.student_id,
+        school_id: verifiedStudent?.school_id,
       });
 
       if (voteError) {
@@ -170,18 +245,89 @@ export default function StudentVoting() {
     }
   };
 
-  const generateNewVoterId = () => {
-    const newVoterId = `voter_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    localStorage.setItem('voterId', newVoterId);
-    setVoterId(newVoterId);
-  };
-
-  const handleNextVoter = () => {
-    generateNewVoterId();
+  const handleLogout = () => {
+    setIsVerified(false);
+    setStudentId('');
+    setSchoolId('');
+    setVerifiedStudent(null);
     setVotes({});
     setSubmittedRoles(new Set());
     setError('');
+    setVerificationError('');
+    setPolls([]);
+    setSelectedPollId('');
+    setIsLoading(true);
   };
+
+  const handleNextVoter = () => {
+    handleLogout();
+  };
+
+  if (!isVerified) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+          <div className="flex justify-center mb-6">
+            <div className="bg-blue-600 p-3 rounded-full">
+              <User className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+            Student Verification
+          </h1>
+          <p className="text-gray-600 text-center mb-6">
+            Enter your credentials to access voting
+          </p>
+
+          <form onSubmit={handleVerifyStudent} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Student ID
+              </label>
+              <input
+                type="text"
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                placeholder="e.g., STU001"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Test IDs: STU001, STU002, STU003, STU004, STU005</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                School ID
+              </label>
+              <input
+                type="text"
+                value={schoolId}
+                onChange={(e) => setSchoolId(e.target.value)}
+                placeholder="e.g., SCHOOL001"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Test School IDs: SCHOOL001, SCHOOL002</p>
+            </div>
+
+            {verificationError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {verificationError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={verificationLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 rounded-lg transition duration-200"
+            >
+              {verificationLoading ? 'Verifying...' : 'Verify & Continue'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   const selectedPoll = polls.find((p) => p.id === selectedPollId);
   const allRolesVoted =
@@ -192,7 +338,20 @@ export default function StudentVoting() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 p-4">
       <div className="container mx-auto max-w-4xl">
-        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain cursor-pointer mb-8" onClick={() => window.location.href = "/"} />
+        <div className="flex justify-between items-center mb-8">
+          <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain cursor-pointer" onClick={() => window.location.href = "/"} />
+          <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg text-sm font-medium">
+            {verifiedStudent?.name}
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-green-600 p-4 rounded-full">
@@ -340,7 +499,7 @@ export default function StudentVoting() {
                         <CheckCircle className="w-16 h-16 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Voting Complete!</h3>  
+                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Voting Complete!</h3>
                     <p className="text-gray-600 mb-8 text-lg">
                       Thank you for voting. Your votes have been recorded successfully.
                     </p>
