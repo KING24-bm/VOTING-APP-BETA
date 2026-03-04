@@ -26,25 +26,25 @@ interface VerifiedStudent {
   id: string;
   student_id: string;
   name: string;
-  school_id: string;
+  class_id: string;
 }
 
 export default function StudentVoting() {
   // Verification states
   const [isVerified, setIsVerified] = useState(false);
   const [studentId, setStudentId] = useState('');
-  const [schoolId, setSchoolId] = useState('');
+  const [classId, setClassId] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationError, setVerificationError] = useState('');
   const [verifiedStudent, setVerifiedStudent] = useState<VerifiedStudent | null>(null);
 
   // Dummy student data for testing
   const DUMMY_STUDENTS: VerifiedStudent[] = [
-    { id: '1', student_id: 'STU001', name: 'John Doe', school_id: 'SCHOOL001' },
-    { id: '2', student_id: 'STU002', name: 'Jane Smith', school_id: 'SCHOOL001' },
-    { id: '3', student_id: 'STU003', name: 'Mike Johnson', school_id: 'SCHOOL002' },
-    { id: '4', student_id: 'STU004', name: 'Sarah Williams', school_id: 'SCHOOL002' },
-    { id: '5', student_id: 'STU005', name: 'Alex Brown', school_id: 'SCHOOL001' },
+    { id: '1', student_id: 'STU001', name: 'John Doe', class_id: 'CLASS001' },
+    { id: '2', student_id: 'STU002', name: 'Jane Smith', class_id: 'CLASS001' },
+    { id: '3', student_id: 'STU003', name: 'Mike Johnson', class_id: 'CLASS002' },
+    { id: '4', student_id: 'STU004', name: 'Sarah Williams', class_id: 'CLASS002' },
+    { id: '5', student_id: 'STU005', name: 'Alex Brown', class_id: 'CLASS001' },
   ];
 
   // Voting states
@@ -76,7 +76,7 @@ export default function StudentVoting() {
     try {
       // First check dummy data (for testing)
       const dummyStudent = DUMMY_STUDENTS.find(
-        (s) => s.student_id === studentId.toUpperCase() && s.school_id === schoolId.toUpperCase()
+        (s) => s.student_id === studentId.toUpperCase() && s.class_id === classId.toUpperCase()
       );
 
       if (dummyStudent) {
@@ -89,13 +89,13 @@ export default function StudentVoting() {
       // Query Supabase for student verification
       const { data, error: supabaseError } = await supabase
         .from('students')
-        .select('id, student_id, name, school_id')
+        .select('id, student_id, name, class_id')
         .eq('student_id', studentId.toUpperCase())
-        .eq('school_id', schoolId.toUpperCase())
+        .eq('class_id', classId.toUpperCase())
         .single();
 
       if (supabaseError || !data) {
-        setVerificationError('Invalid Student ID or School ID. Please try again.');
+        setVerificationError('Invalid Student ID or Class ID. Please try again.');
         setVerificationLoading(false);
         return;
       }
@@ -225,7 +225,7 @@ export default function StudentVoting() {
         candidate_id: candidateId,
         voter_id: voterId,
         student_id: verifiedStudent?.student_id,
-        school_id: verifiedStudent?.school_id,
+        class_id: verifiedStudent?.class_id,
       });
 
       if (voteError) {
@@ -248,7 +248,7 @@ export default function StudentVoting() {
   const handleLogout = () => {
     setIsVerified(false);
     setStudentId('');
-    setSchoolId('');
+    setClassId('');
     setVerifiedStudent(null);
     setVotes({});
     setSubmittedRoles(new Set());
@@ -297,17 +297,17 @@ export default function StudentVoting() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                School ID
+                Class ID
               </label>
               <input
                 type="text"
-                value={schoolId}
-                onChange={(e) => setSchoolId(e.target.value)}
-                placeholder="e.g., SCHOOL001"
+                value={classId}
+                onChange={(e) => setClassId(e.target.value)}
+                placeholder="e.g., CLASS001"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Test School IDs: SCHOOL001, SCHOOL002</p>
+              <p className="text-xs text-gray-500 mt-1">Test Class IDs: CLASS001, CLASS002</p>
             </div>
 
             {verificationError && (
