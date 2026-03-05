@@ -5,6 +5,7 @@ import { LogIn } from 'lucide-react';
 export default function TeacherLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isHuman, setIsHuman] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -16,6 +17,12 @@ export default function TeacherLogin() {
 
     if (!username.trim() || !password) {
       setError('Please enter both username and password');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!isHuman) {
+      setError('Please confirm that you are not a robot');
       setIsLoading(false);
       return;
     }
@@ -78,6 +85,20 @@ export default function TeacherLogin() {
             />
           </div>
 
+          <div className="flex items-center">
+            <input
+              id="human-verification"
+              type="checkbox"
+              checked={isHuman}
+              onChange={(e) => setIsHuman(e.target.checked)}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              disabled={isLoading}
+            />
+            <label htmlFor="human-verification" className="ml-2 block text-sm text-gray-700">
+              I am not a robot
+            </label>
+          </div>
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {error}
@@ -86,7 +107,7 @@ export default function TeacherLogin() {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !isHuman}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Logging in...' : 'Login'}
