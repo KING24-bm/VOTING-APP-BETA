@@ -364,7 +364,7 @@ export default function StudentVoting() {
       <Header />
       <div className="container mx-auto max-w-4xl">
         <div className="flex justify-between items-center mb-8">
-          <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain cursor-pointer" onClick={() => window.location.href = "/"} />
+          {/* logo removed; header provides home link */}
           <div className="bg-green-100 dark:bg-gray-700 text-green-800 dark:text-green-200 px-4 py-2 rounded-lg text-sm font-medium">
             {verifiedStudent?.name}
           </div>

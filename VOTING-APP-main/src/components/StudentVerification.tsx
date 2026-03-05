@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import Header from './Header';
 
 interface VerifiedStudent {
@@ -56,21 +55,7 @@ export default function StudentVerification() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Header />
-      <img 
-        src="/images/euroschool-logo.png" 
-        alt="EuroSchool North Campus" 
-        className="h-16 w-16 object-contain mb-12 cursor-pointer hover:opacity-80" 
-        onClick={() => navigate('/')}
-      />
-      <div className="flex items-start mb-4">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 transition"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back
-        </button>
-      </div>
+      {/* logo and back button removed; header handles navigation to home */}
 
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Trophy, Users, BarChart3, PieChart } from 'lucide-react';
+import { Trophy, Users, BarChart3, PieChart } from 'lucide-react';
 import Header from './Header';
 import {
   BarChart,
@@ -156,14 +156,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Header />
       <div className="container mx-auto max-w-6xl">
-        <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain mb-8" onClick={() => window.location.href = "/"}/>
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Dashboard
-        </button>
+        {/* removed duplicate logo/back; header click navigates home */}
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Poll Results</h1>
