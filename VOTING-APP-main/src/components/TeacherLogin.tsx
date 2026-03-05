@@ -29,6 +29,8 @@ export default function TeacherLogin() {
 
       if (!success) {
         setError("Login failed. Please check your credentials and try again.");
+      } else {
+        navigate('/TeacherDashboard');
       }
     } catch (err) {
       setError("Something went wrong. Please try again.");
