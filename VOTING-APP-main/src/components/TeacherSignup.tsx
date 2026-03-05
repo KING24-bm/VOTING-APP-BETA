@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
+import Header from './Header';
 
 export default function TeacherSignup() {
   const navigate = useNavigate();
@@ -56,13 +57,8 @@ export default function TeacherSignup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <img 
-        src="/images/euroschool-logo.png" 
-        alt="EuroSchool North Campus" 
-        className="h-16 w-16 object-contain mb-12 cursor-pointer hover:opacity-80" 
-        onClick={() => window.location.href = "/"}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Header />
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="flex justify-center mb-6">

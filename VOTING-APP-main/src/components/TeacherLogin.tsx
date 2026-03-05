@@ -1,29 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { LogIn, Moon, Sun } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 export default function TeacherLogin() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDark, setIsDark] = useState<boolean>(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setIsDark(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,21 +42,7 @@ export default function TeacherLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="flex justify-between items-center mb-12">
-        <img
-          src="/images/euroschool-logo.png"
-          alt="EuroSchool North Campus"
-          className="h-16 w-16 object-contain cursor-pointer"
-          onClick={() => navigate("/")}
-        />
-        <button
-          onClick={() => setIsDark(!isDark)}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-          aria-label="Toggle dark mode"
-        >
-          {isDark ? <Sun className="w-6 h-6 text-yellow-500" /> : <Moon className="w-6 h-6 text-gray-700 dark:text-gray-300" />}
-        </button>
-      </div>
+      <Header />
 
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md">
