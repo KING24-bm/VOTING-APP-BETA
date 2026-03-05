@@ -219,14 +219,22 @@ export default function StudentVoting() {
       return;
     }
 
+    const isDummyStudent = DUMMY_STUDENTS.some(s => s.student_id === verifiedStudent?.student_id);
+
     try {
-      const { error: voteError } = await supabase.from('votes').insert({
+      const voteData: any = {
         role_id: roleId,
         candidate_id: candidateId,
         voter_id: voterId,
-        student_id: verifiedStudent?.student_id,
-        class_id: verifiedStudent?.class_id,
-      });
+      };
+
+      // Only include student_id and class_id for non-dummy students
+      if (!isDummyStudent) {
+        voteData.student_id = verifiedStudent?.student_id;
+        voteData.class_id = verifiedStudent?.class_id;
+      }
+
+      const { error: voteError } = await supabase.from('votes').insert(voteData);
 
       if (voteError) {
         if (voteError.code === '23505') {
@@ -237,15 +245,17 @@ export default function StudentVoting() {
         return;
       }
 
-      // Update has_voted to TRUE in students table
-      const { error: updateError } = await supabase
-        .from('students')
-        .update({ has_voted: true })
-        .eq('student_id', verifiedStudent?.student_id);
+      // Only update has_voted for non-dummy students
+      if (!isDummyStudent) {
+        const { error: updateError } = await supabase
+          .from('students')
+          .update({ has_voted: true })
+          .eq('student_id', verifiedStudent?.student_id);
 
-      if (updateError) {
-        console.error('Error updating has_voted:', updateError);
-        // Note: We don't set error here as the vote was successful
+        if (updateError) {
+          console.error('Error updating has_voted:', updateError);
+          // Note: We don't set error here as the vote was successful
+        }
       }
 
       setSubmittedRoles(new Set([...submittedRoles, roleId]));

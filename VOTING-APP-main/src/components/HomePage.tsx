@@ -49,7 +49,7 @@ export default function HomePage({ onSelectTeacher, onSelectStudent }: HomePageP
               </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
-              Teacher Portal
+              Voting Page
             </h2>
             <p className="text-gray-600 text-center text-lg">
               Cast your vote for your favorite candidates
