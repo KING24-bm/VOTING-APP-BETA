@@ -224,8 +224,6 @@ export default function StudentVoting() {
         role_id: roleId,
         candidate_id: candidateId,
         voter_id: voterId,
-        student_id: verifiedStudent?.student_id,
-        class_id: verifiedStudent?.class_id,
       });
 
       if (voteError) {
