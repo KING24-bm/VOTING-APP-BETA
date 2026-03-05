@@ -1,18 +1,13 @@
 import { LogIn, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 export default function TeacherLanding() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      
-      <img
-        src="/images/euroschool-logo.png"
-        alt="EuroSchool North Campus"
-        className="h-16 w-16 object-contain mb-12 cursor-pointer hover:opacity-80"
-        onClick={() => navigate("/")}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Header />
 
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
         <div className="max-w-2xl w-full">
