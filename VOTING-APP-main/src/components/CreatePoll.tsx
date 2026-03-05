@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
+import Header from './Header';
 
 interface Candidate {
   id: string;
@@ -237,7 +238,8 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Header />
       <div className="container mx-auto max-w-4xl">
         <img
           src="/images/euroschool-logo.png"
@@ -246,16 +248,16 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         />
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6 transition"
+          className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition"
         >
           <ArrowLeft className="w-5 h-5" />
           Back to Dashboard
         </button>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             <div>
-              <label className="block text-gray-700 mb-1">Title</label>
+              <label className="block text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input
                 type="text"
                 value={title}
@@ -266,7 +268,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
             </div>
 
             <div>
-              <label className="block text-gray-700 mb-1">
+              <label className="block text-gray-700 dark:text-gray-200 mb-1">
                 Description (optional)
               </label>
               <textarea
@@ -305,7 +307,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                 {role.candidates.map((candidate) => (
                   <div
                     key={candidate.id}
-                    className="flex flex-col gap-4 bg-gray-50 p-4 rounded-lg"
+                    className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
                   >
                     <div className="flex items-center gap-4">
                       <input

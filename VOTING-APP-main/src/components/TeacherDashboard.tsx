@@ -4,6 +4,7 @@ import { PlusCircle, BarChart3, Eye, LogOut } from 'lucide-react';
 import CreatePoll from './CreatePoll';
 import ViewPolls from './ViewPolls';
 import ViewResults from './ViewResults';
+import Header from './Header';
 
 type View = 'menu' | 'create' | 'polls' | 'results';
 
@@ -30,13 +31,14 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <img src="/images/euroschool-logo.png" alt="EuroSchool North Campus" className="h-16 w-16 object-contain cursor-pointer mb-8" onClick={() => window.location.href = "/"} />
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Administrator Dashboard</h1>
-            <p className="text-gray-600">Manage school polls and elections</p>
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">Administrator Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-300">Manage school polls and elections</p>
           </div>
           <button
             onClick={handleLogout}
@@ -50,7 +52,7 @@ export default function TeacherDashboard() {
         <div className="grid md:grid-cols-3 gap-6">
           <button
             onClick={() => setCurrentView('create')}
-            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
           >
             <div className="flex justify-center mb-4">
               <div className="bg-blue-100 p-4 rounded-full">
@@ -65,7 +67,7 @@ export default function TeacherDashboard() {
 
           <button
             onClick={() => setCurrentView('polls')}
-            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
           >
             <div className="flex justify-center mb-4">
               <div className="bg-green-100 p-4 rounded-full">
@@ -80,7 +82,7 @@ export default function TeacherDashboard() {
 
           <button
             onClick={() => setCurrentView('results')}
-            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
           >
             <div className="flex justify-center mb-4">
               <div className="bg-purple-100 p-4 rounded-full">
