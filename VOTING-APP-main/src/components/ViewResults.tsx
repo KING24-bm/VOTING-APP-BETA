@@ -111,6 +111,26 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
             })
           );
 
+          // query NOTA votes (candidate_id IS NULL)
+          try {
+            const { count: notaCount, error: notaError } = await supabase
+              .from('votes')
+              .select('*', { count: 'exact', head: true })
+              .eq('role_id', role.id)
+              .is('candidate_id', null);
+            if (notaError) throw notaError;
+            const nc = notaCount || 0;
+            if (nc > 0) {
+              candidatesWithVotes.push({
+                id: 'nota',
+                name: 'None of the Above',
+                vote_count: nc,
+              } as any);
+            }
+          } catch (err) {
+            console.error('Error fetching NOTA count:', err);
+          }
+
           candidatesWithVotes.sort((a, b) => b.vote_count - a.vote_count);
 
           return {
