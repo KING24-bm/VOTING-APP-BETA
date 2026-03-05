@@ -1,12 +1,8 @@
 import { LogIn, UserPlus } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-interface TeacherLandingProps {
-  onLogin: () => void;
-  onSignup: () => void;
-}
-
-export default function TeacherLanding({ onLogin, onSignup }: TeacherLandingProps) {
+export default function TeacherLanding() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <img 
@@ -29,7 +25,7 @@ export default function TeacherLanding({ onLogin, onSignup }: TeacherLandingProp
           <div className="grid md:grid-cols-2 gap-8">
             {/* Login Button */}
             <button
-              onClick={onLogin}
+              onClick={() => navigate('/TeacherLogin')}
               className="bg-white rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
             >
               <div className="flex justify-center mb-6">
@@ -47,7 +43,7 @@ export default function TeacherLanding({ onLogin, onSignup }: TeacherLandingProp
 
             {/* Sign Up Button */}
             <button
-              onClick={onSignup}
+              onClick={() => navigate('/TeacherSignup')}
               className="bg-white rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
             >
               <div className="flex justify-center mb-6">

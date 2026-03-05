@@ -54,6 +54,12 @@ export default function StudentVerification() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <img 
+        src="/images/euroschool-logo.png" 
+        alt="EuroSchool North Campus" 
+        className="h-16 w-16 object-contain mb-12 cursor-pointer hover:opacity-80" 
+        onClick={() => navigate('/')}
+      />
       <div className="flex items-start mb-4">
         <button
           onClick={() => navigate('/')}
