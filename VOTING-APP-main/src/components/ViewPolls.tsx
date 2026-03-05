@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ArrowLeft, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import Header from './Header';
 
 interface Poll {
