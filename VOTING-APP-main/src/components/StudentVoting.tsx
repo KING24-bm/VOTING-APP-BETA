@@ -82,48 +82,6 @@ export default function StudentVoting() {
     }
   }, [selectedPollId, voterId]);
 
-  const handleVerifyStudent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setVerificationLoading(true);
-    setVerificationError('');
-
-    try {
-      // First check dummy data (for testing)
-      const dummyStudent = DUMMY_STUDENTS.find(
-        (s) => s.student_id === studentId.toUpperCase() && s.class_id === classId.toUpperCase()
-      );
-
-      if (dummyStudent) {
-        setVerifiedStudent(dummyStudent);
-        setIsVerified(true);
-        setVerificationLoading(false);
-        return;
-      }
-
-      // Query Supabase for student verification
-      const { data, error: supabaseError } = await supabase
-        .from('students')
-        .select('id, student_id, name, class_id')
-        .eq('student_id', studentId.toUpperCase())
-        .eq('class_id', classId.toUpperCase())
-        .single();
-
-      if (supabaseError || !data) {
-        setVerificationError('Invalid Student ID or Class ID. Please try again.');
-        setVerificationLoading(false);
-        return;
-      }
-
-      setVerifiedStudent(data as VerifiedStudent);
-      setIsVerified(true);
-    } catch (err) {
-      setVerificationError('An error occurred during verification. Please try again.');
-      console.error(err);
-    }
-
-    setVerificationLoading(false);
-  };
-
   const initializeVoting = () => {
     const storedVoterId = localStorage.getItem(`voterId_${verifiedStudent?.id}`);
     if (!storedVoterId) {
