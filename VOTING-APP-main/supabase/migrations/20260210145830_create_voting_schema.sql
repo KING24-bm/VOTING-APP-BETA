@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS candidates (
 CREATE TABLE IF NOT EXISTS votes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   role_id uuid REFERENCES roles(id) ON DELETE CASCADE,
-  candidate_id uuid REFERENCES candidates(id) ON DELETE CASCADE,
+  candidate_id uuid REFERENCES candidates(id) ON DELETE CASCADE NULL,
   voter_id text NOT NULL,
   created_at timestamptz DEFAULT now(),
   UNIQUE(role_id, voter_id)

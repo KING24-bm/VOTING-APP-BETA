@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Vote, CheckCircle, User, LogOut } from 'lucide-react';
 import Header from './Header';
@@ -31,12 +32,9 @@ interface VerifiedStudent {
 }
 
 export default function StudentVoting() {
+  const navigate = useNavigate();
   // Verification states
   const [isVerified, setIsVerified] = useState(false);
-  const [studentId, setStudentId] = useState('');
-  const [classId, setClassId] = useState('');
-  const [verificationLoading, setVerificationLoading] = useState(false);
-  const [verificationError, setVerificationError] = useState('');
   const [verifiedStudent, setVerifiedStudent] = useState<VerifiedStudent | null>(null);
 
   // Dummy student data for testing
@@ -241,9 +239,13 @@ export default function StudentVoting() {
     try {
       const voteData: any = {
         role_id: roleId,
-        candidate_id: candidateId,
         voter_id: voterId,
       };
+
+      // Only include candidate_id if it's not null (NOTA votes don't have a candidate)
+      if (candidateId !== null) {
+        voteData.candidate_id = candidateId;
+      }
 
       // Only include student_id and class_id for non-dummy students
       if (!isDummyStudent) {
@@ -284,86 +286,23 @@ export default function StudentVoting() {
   };
 
   const handleLogout = () => {
-    setIsVerified(false);
-    setStudentId('');
-    setClassId('');
-    setVerifiedStudent(null);
-    setVotes({});
-    setSubmittedRoles(new Set());
-    setError('');
-    setVerificationError('');
-    setPolls([]);
-    setSelectedPollId('');
-    setIsLoading(true);
+    // Clear session storage and navigate back to verification page
     sessionStorage.removeItem('verifiedStudent');
+    navigate('/StudentVerification');
   };
 
   const handleNextVoter = () => {
     handleLogout();
   };
 
+  // If not verified, this component should not be accessed directly
+  // Users should go through StudentVerification first
   if (!isVerified) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <Header />
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-md">
-          <div className="flex justify-center mb-6">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <User className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
-            Student Verification
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-            Enter your credentials to access voting
-          </p>
-
-          <form onSubmit={handleVerifyStudent} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Student ID
-              </label>
-              <input
-                type="text"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-                placeholder="e.g., STU001"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Test IDs: STU001, STU002, STU003, STU004, STU005</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Class ID
-              </label>
-              <input
-                type="text"
-                value={classId}
-                onChange={(e) => setClassId(e.target.value)}
-                placeholder="e.g., CLASS001"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Test Class IDs: CLASS001, CLASS002</p>
-            </div>
-
-            {verificationError && (
-              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
-                {verificationError}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={verificationLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 rounded-lg transition duration-200"
-            >
-              {verificationLoading ? 'Verifying...' : 'Verify & Continue'}
-            </button>
-          </form>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Redirecting to verification...</p>
         </div>
       </div>
     );
@@ -547,7 +486,7 @@ export default function StudentVoting() {
                       {!hasVoted && (
                         <button
                           onClick={() => submitVote(role.id)}
-                          disabled={!selectedCandidate}
+                          disabled={selectedCandidate === undefined}
                           className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Submit Vote for {role.name}
