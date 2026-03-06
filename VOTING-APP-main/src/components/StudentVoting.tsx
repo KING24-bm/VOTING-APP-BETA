@@ -83,7 +83,7 @@ export default function StudentVoting() {
   }, [selectedPollId, voterId]);
 
   const initializeVoting = () => {
-    const storedVoterId = localStorage.getItem(`voterId_${verifiedStudent?.id}`);
+    const storedVoterId = localStorage.getItem(`voterId _${verifiedStudent?.id}`);
     if (!storedVoterId) {
       const newVoterId = `voter_${verifiedStudent?.id}_${Date.now()}`;
       localStorage.setItem(`voterId_${verifiedStudent?.id}`, newVoterId);
