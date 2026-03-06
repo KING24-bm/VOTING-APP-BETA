@@ -12,7 +12,7 @@ export default function HomePage() {
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-            School Voting System
+            EuroSchool Senate Election App
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">
             A simple and secure way to conduct school elections
@@ -33,7 +33,7 @@ export default function HomePage() {
               Administrator Portal
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-center text-lg">
-              Create and manage polls, view results, and control elections
+              Create and manage polls, view results, and manage elections
             </p>
           </button>
 
