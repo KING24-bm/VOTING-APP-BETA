@@ -60,15 +60,15 @@ export default function StudentVerification() {
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Student Verification</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Student Verification</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               Enter your Student ID and Class ID to continue
             </p>
           </div>
 
           <form onSubmit={handleVerifyStudent} className="space-y-6">
             <div>
-              <label htmlFor="studentId" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="studentId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Student ID
               </label>
               <input
@@ -77,14 +77,14 @@ export default function StudentVerification() {
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 placeholder="e.g., STU001"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 disabled={isLoading}
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="classId" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="classId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Class ID
               </label>
               <input
@@ -93,14 +93,14 @@ export default function StudentVerification() {
                 value={classId}
                 onChange={(e) => setClassId(e.target.value)}
                 placeholder="e.g., CLASS001"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 disabled={isLoading}
                 required
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
@@ -114,7 +114,7 @@ export default function StudentVerification() {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-400">
             <p className="font-semibold mb-2">Demo Credentials:</p>
             <p>• STU001 / CLASS001</p>
             <p>• STU002 / CLASS001</p>

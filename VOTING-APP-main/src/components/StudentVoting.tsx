@@ -58,6 +58,21 @@ export default function StudentVoting() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Check if student was already verified in StudentVerification component
+    const storedStudent = sessionStorage.getItem('verifiedStudent');
+    if (storedStudent) {
+      try {
+        const parsedStudent = JSON.parse(storedStudent);
+        setVerifiedStudent(parsedStudent);
+        setIsVerified(true);
+      } catch (error) {
+        console.error('Error parsing stored student data:', error);
+        sessionStorage.removeItem('verifiedStudent');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (isVerified) {
       initializeVoting();
     }
@@ -280,6 +295,7 @@ export default function StudentVoting() {
     setPolls([]);
     setSelectedPollId('');
     setIsLoading(true);
+    sessionStorage.removeItem('verifiedStudent');
   };
 
   const handleNextVoter = () => {
@@ -296,16 +312,16 @@ export default function StudentVoting() {
               <User className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
             Student Verification
           </h1>
-          <p className="text-gray-600 text-center mb-6">
+          <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
             Enter your credentials to access voting
           </p>
 
           <form onSubmit={handleVerifyStudent} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Student ID
               </label>
               <input
@@ -313,14 +329,14 @@ export default function StudentVoting() {
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 placeholder="e.g., STU001"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Test IDs: STU001, STU002, STU003, STU004, STU005</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Test IDs: STU001, STU002, STU003, STU004, STU005</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Class ID
               </label>
               <input
@@ -328,14 +344,14 @@ export default function StudentVoting() {
                 value={classId}
                 onChange={(e) => setClassId(e.target.value)}
                 placeholder="e.g., CLASS001"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Test Class IDs: CLASS001, CLASS002</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Test Class IDs: CLASS001, CLASS002</p>
             </div>
 
             {verificationError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
                 {verificationError}
               </div>
             )}
@@ -383,30 +399,30 @@ export default function StudentVoting() {
               <Vote className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Student Voting</h1>
-          <p className="text-gray-600">Cast your vote for each role</p>
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">Student Voting</h1>
+          <p className="text-gray-600 dark:text-gray-400">Cast your vote for each role</p>
         </div>
 
         {isLoading ? (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading polls...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading polls...</p>
           </div>
         ) : polls.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <p className="text-gray-600">No active polls available at the moment.</p>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 text-center">
+            <p className="text-gray-600 dark:text-gray-400">No active polls available at the moment.</p>
           </div>
         ) : (
           <>
             {polls.length > 1 && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Poll
                 </label>
                 <select
                   value={selectedPollId}
                   onChange={(e) => setSelectedPollId(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   {polls.map((poll) => (
                     <option key={poll.id} value={poll.id}>
@@ -420,11 +436,11 @@ export default function StudentVoting() {
             {selectedPoll && (
               <div className="space-y-6">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                     {selectedPoll.title}
                   </h2>
                   {selectedPoll.description && (
-                    <p className="text-gray-600">{selectedPoll.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400">{selectedPoll.description}</p>
                   )}
                 </div>
 
@@ -442,7 +458,7 @@ export default function StudentVoting() {
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="text-2xl font-bold text-gray-800">{role.name}</h3>
                         {hasVoted && (
-                          <span className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
+                          <span className="flex items-center gap-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-4 py-2 rounded-full font-semibold">
                             <CheckCircle className="w-5 h-5" />
                             Voted
                           </span>
@@ -460,8 +476,8 @@ export default function StudentVoting() {
                               disabled={hasVoted}
                               className={`p-4 rounded-xl border-2 transition transform hover:scale-105 ${
                                 isSelected
-                                  ? 'border-green-500 bg-green-50 dark:bg-green-900 dark:bg-green-900'
-                                  : 'border-gray-200 hover:border-green-300'
+                                  ? 'border-green-500 bg-green-50 dark:bg-green-900'
+                                  : 'border-gray-200 dark:border-gray-600 hover:border-green-300'
                               } ${hasVoted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                               <div className="flex items-center justify-between">
@@ -470,7 +486,7 @@ export default function StudentVoting() {
                                     {candidate.name}
                                   </h4>
                                   {isSelected && !hasVoted && (
-                                    <p className="text-sm text-green-600 font-medium mt-1">
+                                    <p className="text-sm text-green-600 dark:text-green-400 font-medium mt-1">
                                       Selected
                                     </p>
                                   )}
@@ -492,8 +508,8 @@ export default function StudentVoting() {
                                         className="w-16 h-16 object-cover rounded-lg"
                                       />
                                     ) : (
-                                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                                        <User className="w-10 h-10 text-gray-400" />
+                                      <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                        <User className="w-10 h-10 text-gray-400 dark:text-gray-500" />
                                       </div>
                                     )}
                                   </div>
@@ -510,7 +526,7 @@ export default function StudentVoting() {
                           className={`p-4 rounded-xl border-2 transition transform hover:scale-105 ${
                             selectedCandidate === null
                               ? 'border-green-500 bg-green-50 dark:bg-green-900'
-                              : 'border-gray-200 hover:border-green-300'
+                              : 'border-gray-200 dark:border-gray-600 hover:border-green-300'
                           } ${hasVoted ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                           <div className="flex items-center justify-between">
@@ -519,7 +535,7 @@ export default function StudentVoting() {
                                 None of the Above
                               </h4>
                               {selectedCandidate === null && !hasVoted && (
-                                <p className="text-sm text-green-600 font-medium mt-1">
+                                <p className="text-sm text-green-600 dark:text-green-400 font-medium mt-1">
                                   Selected
                                 </p>
                               )}
@@ -542,14 +558,14 @@ export default function StudentVoting() {
                 })}
 
                 {allRolesVoted && (
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-2xl shadow-xl p-12 text-center">
+                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-900 border-2 border-green-400 dark:border-green-600 rounded-2xl shadow-xl p-12 text-center">
                     <div className="flex justify-center mb-6">
                       <div className="bg-green-600 p-4 rounded-full">
                         <CheckCircle className="w-16 h-16 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-800 mb-4">Voting Complete!</h3>
-                    <p className="text-gray-600 mb-8 text-lg">
+                    <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">Voting Complete!</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
                       Thank you for voting. Your votes have been recorded successfully.
                     </p>
                     <button
@@ -562,7 +578,7 @@ export default function StudentVoting() {
                 )}
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
                     {error}
                   </div>
                 )}

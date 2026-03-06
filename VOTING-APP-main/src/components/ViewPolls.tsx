@@ -91,33 +91,33 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
         </button>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Live Polls</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Live Polls</h1>
 
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading polls...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading polls...</p>
             </div>
           ) : polls.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600">No polls created yet.</p>
+              <p className="text-gray-600 dark:text-gray-400">No polls created yet.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {polls.map((poll) => (
                 <div
                   key={poll.id}
-                  className="border-2 border-gray-200 rounded-xl p-6 hover:shadow-lg transition"
+                  className="border-2 border-gray-200 dark:border-gray-600 rounded-xl p-6 hover:shadow-lg transition"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-bold text-gray-800">{poll.title}</h3>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{poll.title}</h3>
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-semibold ${
                             poll.is_active
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-gray-100 text-gray-700'
+                              ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                           }`}
                         >
                           {poll.is_active ? 'Active' : 'Inactive'}
@@ -126,7 +126,7 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
                       {poll.description && (
                         <p className="text-gray-600 mb-2">{poll.description}</p>
                       )}
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Created: {new Date(poll.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -138,14 +138,14 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
                         title={poll.is_active ? 'Deactivate poll' : 'Activate poll'}
                       >
                         {poll.is_active ? (
-                          <ToggleRight className="w-6 h-6 text-green-600" />
+                          <ToggleRight className="w-6 h-6 text-green-600 dark:text-green-400" />
                         ) : (
-                          <ToggleLeft className="w-6 h-6 text-gray-400" />
+                          <ToggleLeft className="w-6 h-6 text-gray-400 dark:text-gray-500" />
                         )}
                       </button>
                       <button
                         onClick={() => deletePoll(poll.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
                         title="Delete poll"
                       >
                         <Trash2 className="w-6 h-6" />

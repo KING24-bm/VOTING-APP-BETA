@@ -165,27 +165,27 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
         </button>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Poll Results</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Poll Results</h1>
 
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading results...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading results...</p>
             </div>
           ) : polls.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600">No polls created yet.</p>
+              <p className="text-gray-600 dark:text-gray-400">No polls created yet.</p>
             </div>
           ) : (
             <>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Poll
                 </label>
                 <select
                   value={selectedPollId}
                   onChange={(e) => setSelectedPollId(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   {polls.map((poll) => (
                     <option key={poll.id} value={poll.id}>
@@ -203,7 +203,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                       className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition ${
                         chartType === 'bar'
                           ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
                       }`}
                     >
                       <BarChart3 className="w-5 h-5" />
@@ -214,7 +214,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                       className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition ${
                         chartType === 'pie'
                           ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
                       }`}
                     >
                       <PieChart className="w-5 h-5" />
@@ -231,8 +231,8 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                         }));
 
                         return (
-                          <div key={role.id} className="border-2 border-gray-200 rounded-xl p-6">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">{role.name}</h2>
+                          <div key={role.id} className="border-2 border-gray-200 dark:border-gray-600 rounded-xl p-6">
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">{role.name}</h2>
                             <div className="h-96 w-full">
                               <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData}>
@@ -244,8 +244,8 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                                 </BarChart>
                               </ResponsiveContainer>
                             </div>
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <p className="text-sm text-gray-600">
+                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Total votes: {role.candidates.reduce((sum, c) => sum + c.vote_count, 0)}
                               </p>
                             </div>
@@ -275,8 +275,8 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                         }));
 
                         return (
-                          <div key={role.id} className="border-2 border-gray-200 rounded-xl p-6">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">{role.name}</h2>
+                          <div key={role.id} className="border-2 border-gray-200 dark:border-gray-600 rounded-xl p-6">
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">{role.name}</h2>
                             <div className="h-96 w-full flex justify-center">
                               <ResponsiveContainer width="100%" height="100%">
                                 <RechartsPieChart>
@@ -298,8 +298,8 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                                 </RechartsPieChart>
                               </ResponsiveContainer>
                             </div>
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <p className="text-sm text-gray-600">
+                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Total votes: {role.candidates.reduce((sum, c) => sum + c.vote_count, 0)}
                               </p>
                             </div>
@@ -311,7 +311,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-gray-600">No roles or candidates in this poll yet.</p>
+                  <p className="text-gray-600 dark:text-gray-400">No roles or candidates in this poll yet.</p>
                 </div>
               )}
             </>
