@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -64,7 +64,34 @@ function AppContent() {
   );
 }
 
+// custom hook to initialize and update the sitewide "sunset" background
+function useSunsetBackground() {
+  useEffect(() => {
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+      return;
+    }
+
+    const body = document.body;
+    // base styles for the background image
+    body.style.backgroundImage = "url('/images/euroschool-logo.png')";
+    body.style.backgroundRepeat = 'no-repeat';
+    body.style.backgroundAttachment = 'fixed';
+
+    function updateBackground() {
+      // store offset in CSS variable; pseudo-element picks it up
+      const offset = window.innerHeight * 0.25;
+      body.style.setProperty('--bg-offset', `${offset}px`);
+    }
+
+    updateBackground();
+    window.addEventListener('resize', updateBackground);
+    return () => window.removeEventListener('resize', updateBackground);
+  }, []);
+}
+
 function App() {
+  useSunsetBackground();
+
   return (
     <Router>
       <ThemeProvider>

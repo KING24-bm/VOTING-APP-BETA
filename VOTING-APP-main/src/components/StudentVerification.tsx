@@ -28,7 +28,7 @@ export default function StudentVerification() {
   const handleVerifyStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
+    setIsLoading(true);   
 
     try {
       // Check dummy data (for testing)

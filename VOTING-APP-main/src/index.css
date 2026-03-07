@@ -1,3 +1,43 @@
+/* stylelint-disable at-rule-no-unknown -- Tailwind directives are processed by PostCSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
+
+/* global background image using euro school logo as a 'sunset' backdrop */
+@layer base {
+  /* container for the rotating "sunset" logo background. using a pseudo-element allows
+     rotation independent of the page content, while JS updates the vertical offset via a
+     CSS variable. */
+  body {
+    /* make the body itself transparent so the fixed pseudo-element shows through */
+    background-color: transparent;
+    /* CSS variable used for vertical offset, updated by JS hook */
+    --bg-offset: 0px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* use the actual file in public/images */
+    background-image: url('/images/euroschool-logo.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    /* use the offset variable for the vertical position */
+    background-position: center var(--bg-offset);
+    transform-origin: center bottom;
+    z-index: -1;
+    pointer-events: none;
+    animation: rotate-slow 60s linear infinite;
+  }
+
+  @keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}
