@@ -72,10 +72,8 @@ function useSunsetBackground() {
     }
 
     const body = document.body;
-    // base styles for the background image
-    body.style.backgroundImage = "url('/images/euroschool-logo.png')";
-    body.style.backgroundRepeat = 'no-repeat';
-    body.style.backgroundAttachment = 'fixed';
+    // base styles for the background image are defined in src/index.css;
+    // the hook only updates the vertical offset variable.
 
     function updateBackground() {
       // store offset in CSS variable; pseudo-element picks it up
