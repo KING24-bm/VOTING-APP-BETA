@@ -54,6 +54,8 @@ export default function StudentVoting() {
   const [submittedRoles, setSubmittedRoles] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     // Check if student was already verified in StudentVerification component
@@ -173,6 +175,13 @@ export default function StudentVoting() {
 
       setSubmittedRoles(votedRoles);
       setVotes(voteMap);
+
+      // Set current role to the first unvoted role
+      const currentPoll = polls.find((p) => p.id === pollId);
+      if (currentPoll) {
+        const firstUnvotedIndex = currentPoll.roles.findIndex((role) => !votedRoles.has(role.id));
+        setCurrentRoleIndex(firstUnvotedIndex >= 0 ? firstUnvotedIndex : currentPoll.roles.length - 1);
+      }
     } catch (error) {
       console.error('Error checking existing votes:', error);
     }
@@ -237,6 +246,19 @@ export default function StudentVoting() {
 
       setSubmittedRoles(new Set([...submittedRoles, roleId]));
       setError('');
+
+      // Auto-next animation: move to next role after successful submission
+      const selectedPoll = polls.find((p) => p.id === selectedPollId);
+      if (selectedPoll) {
+        const currentIndex = selectedPoll.roles.findIndex((r) => r.id === roleId);
+        if (currentIndex < selectedPoll.roles.length - 1) {
+          setIsTransitioning(true);
+          setTimeout(() => {
+            setCurrentRoleIndex(currentIndex + 1);
+            setIsTransitioning(false);
+          }, 500); // Animation duration
+        }
+      }
     } catch (error) {
       console.error('Error submitting vote:', error);
       setError('Failed to submit vote. Please try again.');
@@ -318,7 +340,11 @@ export default function StudentVoting() {
                 </label>
                 <select
                   value={selectedPollId}
-                  onChange={(e) => setSelectedPollId(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedPollId(e.target.value);
+                    setCurrentRoleIndex(0); // Reset to first role when changing poll
+                    setIsTransitioning(false);
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   {polls.map((poll) => (
@@ -341,15 +367,44 @@ export default function StudentVoting() {
                   )}
                 </div>
 
-                {selectedPoll.roles.map((role) => {
+                {selectedPoll.roles.length > 0 && (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-center space-x-2 mb-4">
+                      {selectedPoll.roles.map((_, index) => (
+                        <div
+                          key={index}
+                          className={`w-3 h-3 rounded-full transition-colors ${
+                            index < currentRoleIndex
+                              ? 'bg-green-500'
+                              : index === currentRoleIndex
+                              ? 'bg-blue-500'
+                              : 'bg-gray-300 dark:bg-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-center text-gray-600 dark:text-gray-400">
+                      Role {currentRoleIndex + 1} of {selectedPoll.roles.length}
+                    </p>
+                  </div>
+                )}
+
+                {selectedPoll.roles.map((role, index) => {
                   const hasVoted = submittedRoles.has(role.id);
                   const selectedCandidate = votes[role.id];
+                  const isCurrentRole = index === currentRoleIndex;
 
                   return (
                     <div
                       key={role.id}
-                      className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 ${
+                      className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 transition-all duration-500 ${
                         hasVoted ? 'opacity-75' : ''
+                      } ${
+                        isCurrentRole && !isTransitioning && !allRolesVoted
+                          ? 'transform scale-100 opacity-100'
+                          : isCurrentRole && isTransitioning
+                          ? 'transform scale-95 opacity-50'
+                          : 'hidden'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-6">
