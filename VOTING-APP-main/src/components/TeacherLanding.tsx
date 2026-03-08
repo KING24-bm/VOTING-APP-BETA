@@ -6,7 +6,14 @@ export default function TeacherLanding() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+
+      {/* Rotating Background Logo */}
+      <div
+        className="rotating-bg"
+        style={{ backgroundImage: "url('/assets/ESNC LOGO BG.PNG')" }}
+      ></div>
+
       <Header />
 
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
@@ -28,7 +35,7 @@ export default function TeacherLanding() {
             <button
               type="button"
               onClick={() => navigate("/TeacherLogin")}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2 z-10"
             >
               <div className="flex justify-center mb-6">
                 <div className="bg-blue-100 dark:bg-blue-900 p-6 rounded-full">
@@ -49,7 +56,7 @@ export default function TeacherLanding() {
             <button
               type="button"
               onClick={() => navigate("/TeacherSignup")}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2 z-10"
             >
               <div className="flex justify-center mb-6">
                 <div className="bg-green-100 dark:bg-green-900 p-6 rounded-full">
@@ -69,6 +76,28 @@ export default function TeacherLanding() {
           </div>
         </div>
       </div>
+
+      {/* Rotating Background Animation */}
+      <style>
+        {`
+        .rotating-bg {
+          position: absolute;
+          inset: 0;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 650px;
+          opacity: 0.06;
+          animation: rotateBg 60s linear infinite;
+          pointer-events: none;
+        }
+
+        @keyframes rotateBg {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        `}
+      </style>
+
     </div>
   );
 }

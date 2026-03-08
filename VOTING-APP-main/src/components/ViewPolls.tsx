@@ -78,10 +78,38 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 overflow-hidden">
+
+      {/* Rotating Background */}
+      <div
+        className="rotating-bg"
+        style={{ backgroundImage: "url('/assets/ESNC LOGO BG.PNG')" }}
+      />
+
+      {/* Rotating Animation Style */}
+      <style>
+        {`
+        .rotating-bg {
+          position: absolute;
+          inset: 0;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 650px;
+          opacity: 0.08;
+          animation: rotateBg 60s linear infinite;
+          pointer-events: none;
+        }
+
+        @keyframes rotateBg {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        `}
+      </style>
+
       <Header />
-      <div className="container mx-auto max-w-4xl">
-        {/* logo removed; header still links to home */}
+
+      <div className="relative container mx-auto max-w-4xl">
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition"
@@ -123,9 +151,11 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
                           {poll.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </div>
+
                       {poll.description && (
                         <p className="text-gray-600 mb-2">{poll.description}</p>
                       )}
+
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Created: {new Date(poll.created_at).toLocaleDateString()}
                       </p>
@@ -143,6 +173,7 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
                           <ToggleLeft className="w-6 h-6 text-gray-400 dark:text-gray-500" />
                         )}
                       </button>
+
                       <button
                         onClick={() => deletePoll(poll.id)}
                         className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
@@ -151,11 +182,13 @@ export default function ViewPolls({ onBack }: ViewPollsProps) {
                         <Trash2 className="w-6 h-6" />
                       </button>
                     </div>
+
                   </div>
                 </div>
               ))}
             </div>
           )}
+
         </div>
       </div>
     </div>

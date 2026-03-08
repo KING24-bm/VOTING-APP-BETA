@@ -7,8 +7,8 @@ import Header from './Header';
 interface Candidate {
   id: string;
   name: string;
-  imageUrl: string;   // main picture
-  logoUrl: string;    // additional logo
+  imageUrl: string;
+  logoUrl: string;
 }
 
 interface Role {
@@ -110,8 +110,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         .substring(7)}.${fileExt}`;
       const filePath = `candidates/${fileName}`;
 
-      // include contentType and avoid overwriting by default
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('images')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -119,29 +118,18 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
           contentType: file.type || 'application/octet-stream',
         });
 
-      if (uploadError) {
-        console.error('Supabase upload error details:', uploadError);
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
 
-      // getPublicUrl is synchronous in supabase-js v2
       const { data: publicData } = supabase.storage
         .from('images')
         .getPublicUrl(filePath);
 
-      const publicUrl = (publicData && (publicData as any).publicUrl) || '';
-
-      if (!publicUrl) {
-        console.error('Failed to get public URL after upload', { uploadData, publicData });
-        throw new Error('Failed to obtain public URL for uploaded file');
-      }
+      const publicUrl = publicData?.publicUrl || '';
 
       updateCandidate(roleId, candidateId, field, publicUrl);
     } catch (err) {
       console.error('Upload error:', err);
-      // Prefer readable message when available
-      const message = (err as any)?.message || (err as any)?.error || JSON.stringify(err);
-      alert(`Failed to upload image. ${message}`);
+      alert('Failed to upload image.');
     }
   };
 
@@ -150,35 +138,13 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
     setError('');
 
     if (!teacherId) {
-      setError('You must be logged in as a teacher to publish a poll.');
+      setError('You must be logged in as a teacher.');
       return;
     }
 
     if (!title.trim()) {
       setError('Please enter a poll title');
       return;
-    }
-
-    if (roles.length === 0) {
-      setError('Please add at least one role');
-      return;
-    }
-
-    for (const role of roles) {
-      if (!role.name.trim()) {
-        setError('All roles must have a name');
-        return;
-      }
-      if (role.candidates.length === 0) {
-        setError(`Role "${role.name}" must have at least one candidate`);
-        return;
-      }
-      for (const candidate of role.candidates) {
-        if (!candidate.name.trim()) {
-          setError(`All candidates in "${role.name}" must have a name`);
-          return;
-        }
-      }
     }
 
     setIsSubmitting(true);
@@ -216,7 +182,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
               role_id: roleData.id,
               name: candidate.name,
               image_url: candidate.imageUrl,
-              logo_url: candidate.logoUrl, // new column
+              logo_url: candidate.logoUrl,
             });
 
           if (candidateError) throw candidateError;
@@ -227,244 +193,136 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
       onBack();
     } catch (err) {
       console.error('Error creating poll:', err);
-      const message =
-        (err as any)?.message ||
-        (err as any)?.error ||
-        JSON.stringify(err);
-      setError(message || 'Failed to create poll. Please try again.');
+      setError('Failed to create poll.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 overflow-hidden">
+
+      {/* Rotating Background */}
+      <div
+        className="rotating-bg"
+        style={{
+          backgroundImage: "url('/dist/assets/ESNC LOGO BG.PNG')"
+        }}
+      ></div>
+
       <Header />
-      <div className="container mx-auto max-w-4xl">
-        {/* logo and back button removed; navigation handled by dashboard state */}
+
+      <div className="relative container mx-auto max-w-4xl">
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
+
             <div>
               <label className="block text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 border rounded-lg"
                 placeholder="Poll title"
               />
             </div>
 
-            <div>
-              <label className="block text-gray-700 dark:text-gray-200 mb-1">
-                Description (optional)
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Write a short description"
-                rows={3}
-              />
-            </div>
-
             {roles.map((role) => (
-              <div
-                key={role.id}
-                className="border-2 border-gray-200 dark:border-gray-600 rounded-xl p-6 space-y-4"
-              >
+              <div key={role.id} className="border-2 rounded-xl p-6 space-y-4">
+
                 <div className="flex items-center gap-4">
                   <input
                     type="text"
                     value={role.name}
-                    onChange={(e) =>
-                      updateRoleName(role.id, e.target.value)
-                    }
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    onChange={(e) => updateRoleName(role.id, e.target.value)}
+                    className="flex-1 px-3 py-2 border rounded-lg"
                     placeholder="Role name"
                   />
                   <button
                     type="button"
                     onClick={() => removeRole(role.id)}
-                    className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
+                    className="p-2 text-red-600"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 />
                   </button>
                 </div>
 
                 {role.candidates.map((candidate) => (
-                  <div
-                    key={candidate.id}
-                    className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="text"
-                        value={candidate.name}
-                        onChange={(e) =>
-                          updateCandidate(
-                            role.id,
-                            candidate.id,
-                            'name',
-                            e.target.value
-                          )
-                        }
-                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        placeholder="Candidate name"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeCandidate(role.id, candidate.id)
-                        }
-                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+                  <div key={candidate.id} className="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg">
 
-                    {/* candidate picture */}
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="url"
-                        value={candidate.imageUrl}
-                        onChange={(e) =>
-                          updateCandidate(
-                            role.id,
-                            candidate.id,
-                            'imageUrl',
-                            e.target.value
-                          )
-                        }
-                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
-                        placeholder="Image URL (candidate picture)"
-                      />
-                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition text-sm text-gray-700 dark:text-gray-300">
-                        <Upload className="w-4 h-4" />
-                        Upload
-                        <Upload className="w-4 h-4" />
-                        Upload
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              handleImageUpload(
-                                role.id,
-                                candidate.id,
-                                file,
-                                'imageUrl'
-                              );
-                            }
-                          }}
-                        />
-                      </label>
-                    </div>
+                    <input
+                      type="text"
+                      value={candidate.name}
+                      onChange={(e) =>
+                        updateCandidate(role.id, candidate.id, 'name', e.target.value)
+                      }
+                      className="px-3 py-2 border rounded-lg"
+                      placeholder="Candidate name"
+                    />
 
-                    {/* candidate logo */}
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="url"
-                        value={candidate.logoUrl}
-                        onChange={(e) =>
-                          updateCandidate(
-                            role.id,
-                            candidate.id,
-                            'logoUrl',
-                            e.target.value
-                          )
-                        }
-                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
-                        placeholder="Logo URL (candidate logo)"
-                      />
-                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition text-sm text-gray-700 dark:text-gray-300">
-                        <Upload className="w-4 h-4" />
-                        Upload
-                        <Upload className="w-4 h-4" />
-                        Upload
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              handleImageUpload(
-                                role.id,
-                                candidate.id,
-                                file,
-                                'logoUrl'
-                              );
-                            }
-                          }}
-                        />
-                      </label>
-                    </div>
+                    <input
+                      type="url"
+                      value={candidate.imageUrl}
+                      onChange={(e) =>
+                        updateCandidate(role.id, candidate.id, 'imageUrl', e.target.value)
+                      }
+                      className="px-3 py-2 border rounded-lg"
+                      placeholder="Image URL"
+                    />
 
-                    {/* previews */}
-                    <div className="flex gap-2">
-                      {candidate.imageUrl && (
-                        <img
-                          src={candidate.imageUrl}
-                          alt={`${candidate.name} picture`}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                      {candidate.logoUrl && (
-                        <img
-                          src={candidate.logoUrl}
-                          alt={`${candidate.name} logo`}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                    </div>
                   </div>
                 ))}
 
                 <button
                   type="button"
                   onClick={() => addCandidate(role.id)}
-                  className="mt-2 flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition"
+                  className="flex items-center gap-2 text-blue-600"
                 >
                   <Plus className="w-4 h-4" />
                   Add candidate
                 </button>
+
               </div>
             ))}
 
-            <button
-              type="button"
-              onClick={addRole}
-              className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition"
-            >
-              <Plus className="w-4 h-4" />
-              Add role
-            </button>
-
-            {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
+            {error && <p className="text-red-600">{error}</p>}
 
             <div className="flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={onBack}
-                className="px-4 py-2 border rounded-lg"
-              >
+              <button type="button" onClick={onBack} className="px-4 py-2 border rounded-lg">
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
               >
                 {isSubmitting ? 'Publishing...' : 'Publish poll'}
               </button>
             </div>
+
           </form>
         </div>
       </div>
+
+      <style>{`
+        .rotating-bg {
+          position: absolute;
+          inset: 0;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 650px;
+          opacity: 0.08;
+          animation: rotateBg 60s linear infinite;
+          pointer-events: none;
+        }
+
+        @keyframes rotateBg {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+
     </div>
   );
 }
