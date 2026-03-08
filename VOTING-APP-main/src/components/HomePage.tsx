@@ -6,56 +6,70 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
+
+      {/* Rotating Background Image */}
+      <div
+        className="absolute inset-0 flex items-center justify-center opacity-20 animate-spin-slow"
+        style={{
+          backgroundImage: "url('C:\\Users\\naiti\\Videos\\VOTING-APP-main\\VOTING-APP-main\\dist\\assets\\ESNC LOGO BG.PNG')",  // <-- ENTER IMAGE PATH HERE
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "contain"
+        }}
+      ></div>
+
       <Header />
-      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-            EuroSchool Senate Election App
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            A simple and secure way to conduct school elections
-          </p>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <button
-            onClick={() => navigate('/TeacherLanding')}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
-          >
-            <div className="flex justify-center mb-6">
-              <div className="bg-blue-100 dark:bg-blue-900 p-6 rounded-full">
-                <UserCog className="w-16 h-16 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">
-              Administrator Portal
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-center text-lg">
-              Create and manage polls, view results, and manage elections
+      <div className="relative flex items-center justify-center min-h-[calc(100vh-120px)]">
+        <div className="max-w-4xl w-full">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+              EuroSchool Senate Election App
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              A simple and secure way to conduct school elections
             </p>
-          </button>
+          </div>
 
-          <button
-            onClick={() => navigate('/StudentVerification')}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
-          >
-            <div className="flex justify-center mb-6">
-              <div className="bg-green-100 dark:bg-green-900 p-6 rounded-full">
-                <Users className="w-16 h-16 text-green-600 dark:text-green-400" />
+          <div className="grid md:grid-cols-2 gap-8">
+            <button
+              onClick={() => navigate('/TeacherLanding')}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
+            >
+              <div className="flex justify-center mb-6">
+                <div className="bg-blue-100 dark:bg-blue-900 p-6 rounded-full">
+                  <UserCog className="w-16 h-16 text-blue-600 dark:text-blue-400" />
+                </div>
               </div>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">
-              Voting Page
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-center text-lg">
-              Cast your vote for your favorite candidates
-            </p>
-          </button>
+              <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">
+                Administrator Portal
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-center text-lg">
+                Create and manage polls, view results, and manage elections
+              </p>
+            </button>
+
+            <button
+              onClick={() => navigate('/StudentVerification')}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 hover:shadow-2xl transition transform hover:-translate-y-2"
+            >
+              <div className="flex justify-center mb-6">
+                <div className="bg-green-100 dark:bg-green-900 p-6 rounded-full">
+                  <Users className="w-16 h-16 text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">
+                Voting Page
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-center text-lg">
+                Cast your vote for your favorite candidates
+              </p>
+            </button>
+          </div>
         </div>
       </div>
-      </div>
+
     </div>
   );
 }
