@@ -157,8 +157,9 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
       return;
     }
 
-    if (!title.trim()) {
-      setError('Please enter a poll title');
+    const validationError = validatePoll();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -256,8 +257,9 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                   />
                   <button
                     type="button"
-                    onClick={() => removeRole(role.id)}
-                    className="p-2 text-red-600"
+                    onClick={() => roles.length > 1 && removeRole(role.id)}
+                    disabled={roles.length <= 1}
+                    className={`p-2 ${roles.length > 1 ? 'text-red-600' : 'text-gray-400 cursor-not-allowed'}`}
                   >
                     <Trash2 />
                   </button>
@@ -266,25 +268,92 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                 {role.candidates.map((candidate) => (
                   <div key={candidate.id} className="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg">
 
-                    <input
-                      type="text"
-                      value={candidate.name}
-                      onChange={(e) =>
-                        updateCandidate(role.id, candidate.id, 'name', e.target.value)
-                      }
-                      className="px-3 py-2 border rounded-lg"
-                      placeholder="Candidate name"
-                    />
+                    <div className="flex items-center justify-between">
+                      <input
+                        type="text"
+                        value={candidate.name}
+                        onChange={(e) =>
+                          updateCandidate(role.id, candidate.id, 'name', e.target.value)
+                        }
+                        className="flex-1 px-3 py-2 border rounded-lg"
+                        placeholder="Candidate name"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeCandidate(role.id, candidate.id)}
+                        className="ml-3 p-2 text-red-600"
+                      >
+                        <Trash2 />
+                      </button>
+                    </div>
 
-                    <input
-                      type="url"
-                      value={candidate.imageUrl}
-                      onChange={(e) =>
-                        updateCandidate(role.id, candidate.id, 'imageUrl', e.target.value)
-                      }
-                      className="px-3 py-2 border rounded-lg"
-                      placeholder="Image URL"
-                    />
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="flex flex-col gap-2">
+                        <label className="text-sm text-gray-600 dark:text-gray-300">
+                          Image URL / Upload
+                        </label>
+                        {candidate.imageUrl ? (
+                          <img
+                            src={candidate.imageUrl}
+                            alt="candidate"
+                            className="h-24 w-full object-cover rounded"
+                          />
+                        ) : null}
+                        <input
+                          type="url"
+                          value={candidate.imageUrl}
+                          onChange={(e) =>
+                            updateCandidate(role.id, candidate.id, 'imageUrl', e.target.value)
+                          }
+                          className="px-3 py-2 border rounded-lg"
+                          placeholder="Image URL"
+                        />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(role.id, candidate.id, file, 'imageUrl');
+                            }
+                          }}
+                          className="text-sm text-gray-500"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <label className="text-sm text-gray-600 dark:text-gray-300">
+                          Logo URL / Upload
+                        </label>
+                        {candidate.logoUrl ? (
+                          <img
+                            src={candidate.logoUrl}
+                            alt="logo"
+                            className="h-24 w-full object-cover rounded"
+                          />
+                        ) : null}
+                        <input
+                          type="url"
+                          value={candidate.logoUrl}
+                          onChange={(e) =>
+                            updateCandidate(role.id, candidate.id, 'logoUrl', e.target.value)
+                          }
+                          className="px-3 py-2 border rounded-lg"
+                          placeholder="Logo URL"
+                        />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(role.id, candidate.id, file, 'logoUrl');
+                            }
+                          }}
+                          className="text-sm text-gray-500"
+                        />
+                      </div>
+                    </div>
 
                   </div>
                 ))}
