@@ -133,6 +133,21 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
     }
   };
 
+  const validatePoll = () => {
+    if (!title.trim()) return 'Please enter a poll title.';
+    if (roles.length === 0) return 'Please add at least one role.';
+
+    for (const role of roles) {
+      if (!role.name.trim()) return 'Please enter a name for every role.';
+      if (role.candidates.length === 0) return 'Each role must have at least one candidate.';
+      for (const candidate of role.candidates) {
+        if (!candidate.name.trim()) return 'Please enter a name for every candidate.';
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -206,7 +221,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
       <div
         className="rotating-bg"
         style={{
-          backgroundImage: "url('/dist/assets/ESNC LOGO BG.PNG')"
+          backgroundImage: "url('/images/euroschool-logo-bg.png')"
         }}
       ></div>
 
