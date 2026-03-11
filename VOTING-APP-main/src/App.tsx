@@ -2,7 +2,6 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import RotatingBackground from './components/RotatingBackground';
 
 // Lazy load pages
 const HomePage = lazy(() => import('./components/HomePage'));
@@ -70,12 +69,7 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-
-          {/* Global rotating ESNC background */}
-          <RotatingBackground />
-
           <AppContent />
-
         </AuthProvider>
       </ThemeProvider>
     </Router>

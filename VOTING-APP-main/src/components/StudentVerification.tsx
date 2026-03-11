@@ -16,6 +16,7 @@ export default function StudentVerification() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Dummy student data for testing
   const DUMMY_STUDENTS: VerifiedStudent[] = [
     { id: '1', student_id: 'STU001', name: 'John Doe', class_id: 'CLASS001' },
     { id: '2', student_id: 'STU002', name: 'Jane Smith', class_id: 'CLASS001' },
@@ -30,13 +31,13 @@ export default function StudentVerification() {
     setIsLoading(true);
 
     try {
+      // Check dummy data (for testing)
       const dummyStudent = DUMMY_STUDENTS.find(
-        (s) =>
-          s.student_id === studentId.toUpperCase() &&
-          s.class_id === classId.toUpperCase()
+        (s) => s.student_id === studentId.toUpperCase() && s.class_id === classId.toUpperCase()
       );
 
       if (dummyStudent) {
+        // Store verified student info for StudentVoting component
         sessionStorage.setItem('verifiedStudent', JSON.stringify(dummyStudent));
         navigate('/StudentVoting');
         return;
@@ -52,22 +53,14 @@ export default function StudentVerification() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-
-      {/* Rotating Background Logo */}
-      <div
-        className="rotating-bg"
-        style={{ backgroundImage: "url('/assets/ESNC LOGO BG.PNG')" }}
-      ></div>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Header />
+      {/* logo and back button removed; header handles navigation to home */}
 
       <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md z-10">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-              Student Verification
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Student Verification</h1>
             <p className="text-gray-600 dark:text-gray-400">
               Enter your Student ID and Class ID to continue
             </p>
@@ -75,13 +68,9 @@ export default function StudentVerification() {
 
           <form onSubmit={handleVerifyStudent} className="space-y-6">
             <div>
-              <label
-                htmlFor="studentId"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
+              <label htmlFor="studentId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Student ID
               </label>
-
               <input
                 id="studentId"
                 type="text"
@@ -95,13 +84,9 @@ export default function StudentVerification() {
             </div>
 
             <div>
-              <label
-                htmlFor="classId"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
+              <label htmlFor="classId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Class ID
               </label>
-
               <input
                 id="classId"
                 type="text"
@@ -137,28 +122,6 @@ export default function StudentVerification() {
           </div>
         </div>
       </div>
-
-      {/* Rotating Background Animation */}
-      <style>
-        {`
-        .rotating-bg {
-          position: absolute;
-          inset: 0;
-          background-repeat: no-repeat;
-          background-position: center;
-          background-size: 650px;
-          opacity: 0.08;
-          animation: rotateBg 60s linear infinite;
-          pointer-events: none;
-        }
-
-        @keyframes rotateBg {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        `}
-      </style>
-
     </div>
   );
 }

@@ -31,29 +31,15 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden">
-
-      {/* Rotating Background Image */}
-      <div
-        className="rotating-bg"
-        style={{
-          backgroundImage: "url('/dist/assets/ESNC LOGO BG.PNG')"
-        }}
-      ></div>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <Header />
-
-      <div className="relative container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
+        {/* logo removed; header click navigates home */}
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-              Administrator Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Manage school polls and elections
-            </p>
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">Administrator Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-300">Manage school polls and elections</p>
           </div>
-
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
@@ -64,7 +50,6 @@ export default function TeacherDashboard() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-
           <button
             onClick={() => setCurrentView('create')}
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition transform hover:-translate-y-1"
@@ -74,16 +59,11 @@ export default function TeacherDashboard() {
                 <PlusCircle className="w-12 h-12 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
-
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
-              Create Poll
-            </h2>
-
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">Create Poll</h2>
             <p className="text-gray-600 dark:text-gray-400 text-center">
               Create a new poll with multiple roles and candidates
             </p>
           </button>
-
 
           <button
             onClick={() => setCurrentView('polls')}
@@ -94,16 +74,11 @@ export default function TeacherDashboard() {
                 <Eye className="w-12 h-12 text-green-600 dark:text-green-400" />
               </div>
             </div>
-
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
-              View Live Polls
-            </h2>
-
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">View Live Polls</h2>
             <p className="text-gray-600 dark:text-gray-400 text-center">
               See all active polls and manage them
             </p>
           </button>
-
 
           <button
             onClick={() => setCurrentView('results')}
@@ -114,44 +89,13 @@ export default function TeacherDashboard() {
                 <BarChart3 className="w-12 h-12 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">
-              View Results
-            </h2>
-
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 text-center">View Results</h2>
             <p className="text-gray-600 dark:text-gray-400 text-center">
               Check live vote counts and winners
             </p>
           </button>
-
         </div>
       </div>
-
-      {/* Animation CSS */}
-      <style>
-        {`
-        .rotating-bg {
-          position: absolute;
-          inset: 0;
-          background-repeat: no-repeat;
-          background-position: center;
-          background-size: 650px;
-          opacity: 0.08;
-          animation: rotateBg 60s linear infinite;
-          pointer-events: none;
-        }
-
-        @keyframes rotateBg {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        `}
-      </style>
-
     </div>
   );
 }
