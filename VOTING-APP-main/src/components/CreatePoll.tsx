@@ -7,8 +7,8 @@ import Header from './Header';
 interface Candidate {
   id: string;
   name: string;
-  imageUrl: string;   // main picture
-  logoUrl: string;    // additional logo
+  imageUrl: string;
+  logoUrl: string;
 }
 
 interface Role {
@@ -39,7 +39,9 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
   };
 
   const removeRole = (roleId: string) => {
-    setRoles(roles.filter((r) => r.id !== roleId));
+    if (roles.length > 1) {
+      setRoles(roles.filter((r) => r.id !== roleId));
+    }
   };
 
   const updateRoleName = (roleId: string, name: string) => {
@@ -110,7 +112,6 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         .substring(7)}.${fileExt}`;
       const filePath = `candidates/${fileName}`;
 
-      // include contentType and avoid overwriting by default
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('images')
         .upload(filePath, file, {
@@ -124,7 +125,6 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
         throw uploadError;
       }
 
-      // getPublicUrl is synchronous in supabase-js v2
       const { data: publicData } = supabase.storage
         .from('images')
         .getPublicUrl(filePath);
@@ -139,51 +139,72 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
       updateCandidate(roleId, candidateId, field, publicUrl);
     } catch (err) {
       console.error('Upload error:', err);
-      // Prefer readable message when available
       const message = (err as any)?.message || (err as any)?.error || JSON.stringify(err);
       alert(`Failed to upload image. ${message}`);
     }
+  };
+
+  const validateInputs = () => {
+    if (!teacherId) {
+      setError('You must be logged in to create a poll');
+      return false;
+    }
+
+    if (!title.trim()) {
+      setError('Please enter a poll title');
+      return false;
+    }
+
+    if (title.length > 255) {
+      setError('Title must be less than 255 characters');
+      return false;
+    }
+
+    if (description.length > 1000) {
+      setError('Description must be less than 1000 characters');
+      return false;
+    }
+
+    if (roles.length === 0) {
+      setError('Please add at least one role');
+      return false;
+    }
+
+    for (const role of roles) {
+      if (!role.name.trim()) {
+        setError('All roles must have a name');
+        return false;
+      }
+      if (role.candidates.length === 0) {
+        setError(`Role "${role.name}" must have at least one candidate`);
+        return false;
+      }
+      for (const candidate of role.candidates) {
+        if (!candidate.name.trim()) {
+          setError(`All candidates in "${role.name}" must have a name`);
+          return false;
+        }
+      }
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!teacherId) {
-      setError('You must be logged in as a teacher to publish a poll.');
-      return;
-    }
-
-    if (!title.trim()) {
-      setError('Please enter a poll title');
-      return;
-    }
-
-    if (roles.length === 0) {
-      setError('Please add at least one role');
-      return;
-    }
-
-    for (const role of roles) {
-      if (!role.name.trim()) {
-        setError('All roles must have a name');
-        return;
-      }
-      if (role.candidates.length === 0) {
-        setError(`Role "${role.name}" must have at least one candidate`);
-        return;
-      }
-      for (const candidate of role.candidates) {
-        if (!candidate.name.trim()) {
-          setError(`All candidates in "${role.name}" must have a name`);
-          return;
-        }
-      }
-    }
+    if (!validateInputs()) return;
 
     setIsSubmitting(true);
 
     try {
+      if (!teacherId) {
+        setError('You must be logged in to create a poll');
+        setIsSubmitting(false);
+        return;
+      }
+
       const { data: poll, error: pollError } = await supabase
         .from('polls')
         .insert({
@@ -216,7 +237,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
               role_id: roleData.id,
               name: candidate.name,
               image_url: candidate.imageUrl,
-              logo_url: candidate.logoUrl, // new column
+              logo_url: candidate.logoUrl,
             });
 
           if (candidateError) throw candidateError;
@@ -241,18 +262,23 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Header />
       <div className="container mx-auto max-w-4xl">
-        {/* logo and back button removed; navigation handled by dashboard state */}
-
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          {error && (
+            <div className="mb-6 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-900 dark:border-red-700 dark:text-red-300">
+              {error}
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-8">
             <div>
-              <label className="block text-gray-700 dark:text-gray-200 mb-1">Title</label>
+              <label className="block text-gray-700 dark:text-gray-200 mb-1">Title *</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Poll title"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -266,6 +292,7 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Write a short description"
                 rows={3}
+                disabled={isSubmitting}
               />
             </div>
 
@@ -282,12 +309,14 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                       updateRoleName(role.id, e.target.value)
                     }
                     className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    placeholder="Role name"
+                    placeholder="Role name *"
+                    disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => removeRole(role.id)}
-                    className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
+                    disabled={roles.length <= 1 || isSubmitting}
+                    className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -311,20 +340,21 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                           )
                         }
                         className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        placeholder="Candidate name"
+                        placeholder="Candidate name *"
+                        disabled={isSubmitting}
                       />
                       <button
                         type="button"
                         onClick={() =>
                           removeCandidate(role.id, candidate.id)
                         }
-                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
+                        disabled={isSubmitting}
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
 
-                    {/* candidate picture */}
                     <div className="flex items-center gap-2">
                       <input
                         type="url"
@@ -339,16 +369,16 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                         }
                         className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                         placeholder="Image URL (candidate picture)"
+                        disabled={isSubmitting}
                       />
-                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition text-sm text-gray-700 dark:text-gray-300">
-                        <Upload className="w-4 h-4" />
-                        Upload
+                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition text-sm text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
                         <Upload className="w-4 h-4" />
                         Upload
                         <input
                           type="file"
                           accept="image/*"
                           className="hidden"
+                          disabled={isSubmitting}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
@@ -364,7 +394,6 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                       </label>
                     </div>
 
-                    {/* candidate logo */}
                     <div className="flex items-center gap-2">
                       <input
                         type="url"
@@ -379,16 +408,16 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                         }
                         className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                         placeholder="Logo URL (candidate logo)"
+                        disabled={isSubmitting}
                       />
-                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition text-sm text-gray-700 dark:text-gray-300">
-                        <Upload className="w-4 h-4" />
-                        Upload
+                      <label className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg cursor-pointer transition text-sm text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
                         <Upload className="w-4 h-4" />
                         Upload
                         <input
                           type="file"
                           accept="image/*"
                           className="hidden"
+                          disabled={isSubmitting}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
@@ -404,7 +433,6 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                       </label>
                     </div>
 
-                    {/* previews */}
                     <div className="flex gap-2">
                       {candidate.imageUrl && (
                         <img
@@ -427,7 +455,8 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
                 <button
                   type="button"
                   onClick={() => addCandidate(role.id)}
-                  className="mt-2 flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition"
+                  disabled={isSubmitting}
+                  className="mt-2 flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Plus className="w-4 h-4" />
                   Add candidate
@@ -438,26 +467,26 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
             <button
               type="button"
               onClick={addRole}
-              className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="w-4 h-4" />
               Add role
             </button>
 
-            {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
-
             <div className="flex justify-end gap-4">
               <button
                 type="button"
                 onClick={onBack}
-                className="px-4 py-2 border rounded-lg"
+                disabled={isSubmitting}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Publishing...' : 'Publish poll'}
               </button>
@@ -468,3 +497,4 @@ export default function CreatePoll({ onBack }: CreatePollProps) {
     </div>
   );
 }
+

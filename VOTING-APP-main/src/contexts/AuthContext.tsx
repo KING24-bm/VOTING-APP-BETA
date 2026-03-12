@@ -26,9 +26,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       const user = username.trim();
-      // In a production system the password should be hashed and verified
-      // with a secure hashing algorithm. Here we're just doing a simple
-      // equality check for demonstration purposes.
       const { data: teacher, error } = await supabase
         .from('teachers')
         .select('id')
@@ -74,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           {
             username: user,
             email: email.trim(),
-            password: password, // In production, this should be hashed
+            password: password,
             school_name: schoolName.trim(),
           }
         ])
@@ -115,3 +112,4 @@ export function useAuth() {
   }
   return context;
 }
+

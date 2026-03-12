@@ -51,8 +51,6 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
   useEffect(() => {
     if (selectedPollId) {
       fetchResults(selectedPollId);
-      const interval = setInterval(() => fetchResults(selectedPollId), 3000);
-      return () => clearInterval(interval);
     }
   }, [selectedPollId]);
 
@@ -237,7 +235,7 @@ export default function ViewResults({ onBack }: ViewResultsProps) {
                               <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData}>
                                   <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                  <XAxis dataKey="name" />
                                   <YAxis />
                                   <Tooltip />
                                   <Bar dataKey="votes" fill="#2563eb" radius={[8, 8, 0, 0]} />

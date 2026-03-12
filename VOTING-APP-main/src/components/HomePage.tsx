@@ -12,7 +12,7 @@ export default function HomePage() {
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-            School Voting System
+            EuroSchool Senate Election Web App
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">
             A simple and secure way to conduct school elections

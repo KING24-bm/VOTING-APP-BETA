@@ -1,59 +1,79 @@
-import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { EyeIcon, EyeOffIcon, UserPlus } from 'lucide-react';
 import Header from './Header';
 
-export default function TeacherSignup() {
-  const navigate = useNavigate();
+const TeacherSignup: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [schoolName, setSchoolName] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  
+  const navigate = useNavigate();
   const { signup } = useAuth();
+
+  const validateInputs = () => {
+    if (!username.trim()) {
+      setError('Username is required');
+      return false;
+    }
+    
+    if (!email.trim()) {
+      setError('Email is required');
+      return false;
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError('Email address is invalid');
+      return false;
+    }
+    
+    if (!schoolName.trim()) {
+      setError('School name is required');
+      return false;
+    }
+    
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return false;
+    }
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    // Validation
-    if (!username.trim() || !email.trim() || !password || !confirmPassword || !schoolName.trim()) {
-      setError('Please fill in all fields');
-      setIsLoading(false);
-      return;
+    
+    if (!validateInputs()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const success = await signup(username, email, password, schoolName);
+      
+      if (success) {
+        navigate('/TeacherDashboard');
+      } else {
+        setError('Signup failed. This username may already exist.');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      setIsLoading(false);
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address');
-      setIsLoading(false);
-      return;
-    }
-
-    const success = await signup(username, email, password, schoolName);
-
-    if (!success) {
-      setError('Signup failed. This username or email may already exist. Please try again.');
-    } else {
-      navigate('/TeacherDashboard');
-    }
-
-    setIsLoading(false);
   };
 
   return (
@@ -74,6 +94,12 @@ export default function TeacherSignup() {
             Sign up to manage your school's voting system
           </p>
 
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-900 dark:border-red-700 dark:text-red-300">
+              {error}
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -86,13 +112,13 @@ export default function TeacherSignup() {
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Choose a username"
-                disabled={isLoading}
+                disabled={loading}
               />
             </div>
-
+            
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
+                Email Address
               </label>
               <input
                 id="email"
@@ -101,10 +127,10 @@ export default function TeacherSignup() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Enter your email"
-                disabled={isLoading}
+                disabled={loading}
               />
             </div>
-
+            
             <div>
               <label htmlFor="schoolName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 School Name
@@ -116,67 +142,92 @@ export default function TeacherSignup() {
                 onChange={(e) => setSchoolName(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Enter your school name"
-                disabled={isLoading}
+                disabled={loading}
               />
             </div>
-
+            
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Create a password (min 8 characters)"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder="Create a password (min 8 characters)"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-500" />
+                  )}
+                </button>
+              </div>
             </div>
-
+            
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirm Password
               </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Confirm your password"
-                disabled={isLoading}
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
-                {error}
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder="Confirm your password"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={loading}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOffIcon className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-500" />
+                  )}
+                </button>
               </div>
-            )}
-
+            </div>
+            
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+              className={`w-full py-3 px-4 rounded-lg text-white font-medium transition ${
+                loading 
+                  ? 'bg-green-400 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
+              }`}
             >
-              {isLoading ? 'Creating Account...' : 'Sign Up'}
+              {loading ? 'Creating Account...' : 'Sign Up'}
             </button>
-
-            <p className="text-center text-gray-600 dark:text-gray-400 text-sm">
-              Already have an account?{' '}
-              <button
-                type="button"
-                onClick={() => navigate('/TeacherLogin')}
-                className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold"
-              >
-                Login here
-              </button>
-            </p>
           </form>
+          
+          <p className="mt-6 text-center text-gray-600 dark:text-gray-400">
+            Already have an account?{' '}
+            <a href="/TeacherLogin" className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium">
+              Log in
+            </a>
+          </p>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default TeacherSignup;
+

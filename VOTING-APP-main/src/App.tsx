@@ -2,6 +2,8 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import ErrorBoundary from './components/ErrorBoundary';
+import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy load pages
 const HomePage = lazy(() => import('./components/HomePage'));
@@ -11,13 +13,6 @@ const TeacherSignup = lazy(() => import('./components/TeacherSignup'));
 const TeacherDashboard = lazy(() => import('./components/TeacherDashboard'));
 const StudentVerification = lazy(() => import('./components/StudentVerification'));
 const StudentVoting = lazy(() => import('./components/StudentVoting'));
-
-// Loading spinner
-const LoadingSpinner = () => (
-  <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-  </div>
-);
 
 // Protected Route for Teacher Dashboard
 function ProtectedTeacherRoute() {
@@ -67,11 +62,13 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <ThemeProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </ThemeProvider>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
     </Router>
   );
 }
